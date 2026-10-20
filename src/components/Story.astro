@@ -1,0 +1,228 @@
+---
+import Icon from './Icon.astro';
+
+// Dates: nexow.studio's project log (src/data/log.ts there) and, for #18,
+// the token's own metadata.
+const timeline = [
+  {
+    when: 'Nov 2022',
+    title: 'Beenzer starts',
+    body: 'A mobile dApp on Solana, built in React Native: snap, mint, drop it on the map.',
+  },
+  {
+    when: '16 Feb 2023',
+    title: 'BEENZER #18',
+    body: 'Minted in Savigny, Switzerland. Still on-chain, still on Arweave, still the post this page lands on.',
+  },
+  {
+    when: 'Oct 2026',
+    title: 'A new home at Nexow',
+    body: 'Beenzer becomes a product of Nexow, Inc. and gets a fresh codebase.',
+  },
+  {
+    when: 'Now',
+    title: 'Rebuilt in Flutter',
+    body: 'A new app for iOS and Android, on the same server: map, feed, chat, camera and mint, in light and dark.',
+    live: true,
+  },
+  {
+    when: 'Next',
+    title: 'Launch',
+    body: 'In the App Store and on Google Play. Follow along to be there when it lands.',
+  },
+];
+---
+
+<section class="story section" id="story" aria-labelledby="story-title">
+  <div class="container grid">
+    <div class="copy">
+      <p class="eyebrow" data-reveal>Story</p>
+      <h2 class="h2" id="story-title" data-split>Been here since 2022.</h2>
+      <p class="lead" data-reveal>
+        Beenzer began in 2022 as a social app that minted straight from the phone camera, on Solana. Now it is being
+        rebuilt from the ground up, around the same idea: every moment keeps its place.
+      </p>
+
+      <ol class="timeline" role="list">
+        {
+          timeline.map((t) => (
+            <li class:list={{ live: t.live }} data-reveal>
+              <span class="when mono">{t.when}</span>
+              <div>
+                <h3 class="t-title">
+                  {t.live && <span class="live-dot" aria-hidden="true" />}
+                  {t.title}
+                </h3>
+                <p class="body">{t.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <figure class="original" data-reveal>
+      <div class="frame">
+        <video
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster="/media/original-app.jpg"
+          data-src="/media/original-app.mp4"
+          aria-label="A walkthrough of the original Beenzer app"
+          data-story-video></video>
+        <button class="sound" type="button" data-sound aria-pressed="false">
+          <Icon name="volume-x" size={16} class="off" />
+          <Icon name="volume-2" size={16} class="on" />
+          <span>Sound</span>
+        </button>
+      </div>
+      <figcaption class="mono">The original app, in React Native</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: clamp(48px, 8vw, 120px);
+    align-items: start;
+  }
+  .copy {
+    display: grid;
+    gap: 24px;
+  }
+  .copy .h2 {
+    max-width: 11ch;
+  }
+  .timeline {
+    position: relative;
+    display: grid;
+    margin-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .timeline li {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .when {
+    padding-top: 4px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .live .when {
+    color: var(--neon);
+  }
+  .t-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  .original {
+    position: sticky;
+    top: calc(var(--header-h) + 40px);
+    display: grid;
+    gap: 16px;
+    justify-items: center;
+  }
+  .frame {
+    position: relative;
+    width: min(300px, 70vw);
+    aspect-ratio: 360 / 796;
+    padding: 10px;
+    border-radius: 44px;
+    background: linear-gradient(145deg, #2a2a30, #0c0c0e 40%, #1d1d22);
+    box-shadow:
+      inset 0 0 0 1.5px rgb(255 255 255 / 0.12),
+      0 40px 100px -30px rgb(0 0 0 / 0.9);
+    rotate: 3deg;
+  }
+  .frame video {
+    width: 100%;
+    height: 100%;
+    border-radius: 34px;
+    object-fit: cover;
+    background: #000;
+  }
+  .sound {
+    position: absolute;
+    right: 22px;
+    bottom: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 99px;
+    background: rgb(0 0 0 / 0.6);
+    backdrop-filter: blur(8px);
+    font-size: 0.8rem;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .sound :global(.on),
+  .sound[aria-pressed='true'] :global(.off) {
+    display: none;
+  }
+  .sound[aria-pressed='true'] :global(.on) {
+    display: block;
+  }
+  .original figcaption {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .original {
+      position: relative;
+      top: 0;
+    }
+    .timeline li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+  }
+</style>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>('[data-story-video]');
+  const sound = document.querySelector<HTMLButtonElement>('[data-sound]');
+  if (video) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const load = () => {
+      if (!video.src) video.src = video.dataset.src!;
+    };
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !reduced) {
+          load();
+          video.play().catch(() => {});
+        } else video.pause();
+      },
+      { threshold: 0.35 },
+    ).observe(video);
+    sound?.addEventListener('click', () => {
+      load();
+      video.muted = !video.muted;
+      sound.setAttribute('aria-pressed', String(!video.muted));
+      video.play().catch(() => {});
+    });
+  }
+</script>

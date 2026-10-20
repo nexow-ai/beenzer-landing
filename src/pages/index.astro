@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import AppTour from '../components/AppTour.astro';
+import Showcase from '../components/Showcase.astro';
+import OnChain from '../components/OnChain.astro';
+import Story from '../components/Story.astro';
+import Team from '../components/Team.astro';
+import JournalCards from '../components/JournalCards.astro';
+import Faq from '../components/Faq.astro';
+import Follow from '../components/Follow.astro';
+import Icon from '../components/Icon.astro';
+import { faqSchema } from '../data/faq';
+
+const posts = (await getCollection('journal')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime() || a.data.kind.localeCompare(b.data.kind),
+);
+---
+
+<Base schema={[faqSchema]}>
+  <Hero />
+  <AppTour />
+  <Showcase />
+  <OnChain />
+  <Story />
+  <Team />
+  <section class="journal section" id="journal" aria-labelledby="journal-title">
+    <div class="container">
+      <div class="journal-head">
+        <div>
+          <p class="eyebrow" data-reveal>Journal</p>
+          <h2 class="h2" id="journal-title" data-split>Notes from the map.</h2>
+        </div>
+        <a class="btn ghost" href="/journal/" data-reveal>All posts <Icon name="arrow-right" /></a>
+      </div>
+      <JournalCards posts={posts.slice(0, 3)} />
+    </div>
+  </section>
+  <Faq />
+  <Follow />
+</Base>
+
+<style>
+  .journal {
+    border-top: 1px solid var(--line);
+  }
+  .journal-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+  .journal-head > div {
+    display: grid;
+    gap: 20px;
+  }
+</style>

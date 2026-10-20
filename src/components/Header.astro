@@ -1,0 +1,307 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+
+/** Section links resolve on every page: on the home page they scroll, elsewhere they go home first. */
+const nav = [
+  { label: 'How it works', href: '/#how' },
+  { label: 'On-chain', href: '/#onchain' },
+  { label: 'Story', href: '/#story' },
+  { label: 'Journal', href: '/journal/' },
+  { label: 'FAQ', href: '/#faq' },
+];
+const path = Astro.url.pathname;
+---
+
+<header class="site-header" data-header>
+  <div class="bar container">
+    <a href="/" class="home" aria-label="Beenzer, home">
+      <Logo size={30} />
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <ul role="list">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={item.href === '/journal/' && path.startsWith('/journal') ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="end">
+      <a class="btn cta" href="/#follow">
+        <span class="live-dot" aria-hidden="true"></span>
+        Follow the build
+      </a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" data-menu-btn>
+        <span class="sr-only">Menu</span>
+        <span class="burger" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="menu" id="menu" data-menu hidden>
+    <nav aria-label="Mobile">
+      <ul role="list">
+        {
+          [{ label: 'Home', href: '/' }, ...nav, { label: 'Follow the build', href: '/#follow' }].map((item, i) => (
+            <li style={`--i:${i}`}>
+              <a href={item.href} data-menu-link>
+                <span class="mono">{String(i).padStart(2, '0')}</span>
+                {item.label}
+                <Icon name="arrow-up-right" size={22} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <p class="menu-foot mono">A Nexow, Inc. product</p>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    height: var(--header-h);
+    transition:
+      transform 0.5s var(--ease-out),
+      background-color 0.4s,
+      box-shadow 0.4s;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(5 5 6 / 0.62);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 1px 0 var(--line);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .site-header[data-scrolled]::before {
+    opacity: 1;
+  }
+  .site-header[data-hidden]:not([data-open]) {
+    transform: translateY(-100%);
+  }
+  .bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    gap: 24px;
+  }
+  .home {
+    display: inline-flex;
+    padding: 8px 0;
+  }
+  .nav ul {
+    display: flex;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.035);
+    box-shadow: inset 0 0 0 1px var(--line);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .nav a {
+    display: block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: var(--text-2);
+    transition:
+      color 0.25s,
+      background-color 0.25s;
+  }
+  .nav a:hover,
+  .nav a[aria-current='page'] {
+    color: var(--text);
+    background: rgb(255 255 255 / 0.07);
+  }
+  .end {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cta {
+    min-height: 44px;
+    padding: 0 18px;
+    font-size: 0.9rem;
+    --btn-bg: rgb(255 255 255 / 0.06);
+    --btn-fg: var(--text);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .cta:hover {
+    --btn-bg: var(--neon);
+    --btn-fg: #00180b;
+  }
+  .cta:hover .live-dot {
+    background: #00180b;
+  }
+  .cta:hover .live-dot::after {
+    border-color: #00180b;
+  }
+  .menu-btn {
+    display: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    background: rgb(255 255 255 / 0.04);
+  }
+  .burger {
+    position: relative;
+    display: block;
+    width: 18px;
+    height: 10px;
+    margin: auto;
+  }
+  .burger i {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform 0.45s var(--ease-out),
+      top 0.45s var(--ease-out);
+  }
+  .burger i:first-child {
+    top: 0;
+  }
+  .burger i:last-child {
+    top: 8.5px;
+  }
+  [data-open] .burger i:first-child {
+    top: 4.25px;
+    transform: rotate(45deg);
+  }
+  [data-open] .burger i:last-child {
+    top: 4.25px;
+    transform: rotate(-45deg);
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: calc(var(--header-h) + 24px) var(--gutter) 32px;
+    background: rgb(5 5 6 / 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu ul {
+    display: grid;
+  }
+  .menu li {
+    border-bottom: 1px solid var(--line);
+    animation: menu-in 0.6s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 45ms);
+  }
+  .menu a {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .menu a .mono {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--neon);
+    letter-spacing: 0;
+  }
+  .menu a :global(.icon) {
+    margin-left: auto;
+    color: var(--text-3);
+  }
+  .menu-foot {
+    font-size: 0.75rem;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @media (max-width: 1020px) {
+    .nav {
+      display: none;
+    }
+    .menu-btn {
+      display: grid;
+    }
+  }
+  @media (max-width: 520px) {
+    .cta {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const button = header.querySelector<HTMLButtonElement>('[data-menu-btn]')!;
+  const menu = header.querySelector<HTMLElement>('[data-menu]')!;
+
+  function setOpen(open: boolean) {
+    button.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+    header.toggleAttribute('data-open', open);
+    document.documentElement.classList.toggle('menu-open', open);
+    window.dispatchEvent(new CustomEvent(open ? 'scroll-lock' : 'scroll-unlock'));
+  }
+
+  button.addEventListener('click', () => setOpen(Boolean(menu.hidden)));
+  menu.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hidden) {
+      setOpen(false);
+      button.focus();
+    }
+  });
+  window.matchMedia('(min-width: 1021px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  // Solid once the page moves; tucked away while reading down, back on the way up.
+  let last = window.scrollY;
+  function onScroll() {
+    const y = window.scrollY;
+    header.toggleAttribute('data-scrolled', y > 24);
+    if (Math.abs(y - last) > 6) {
+      header.toggleAttribute('data-hidden', y > last && y > 400);
+      last = y;
+    }
+  }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>

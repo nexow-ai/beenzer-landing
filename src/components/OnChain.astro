@@ -1,0 +1,379 @@
+---
+/**
+ * Under the hood. Every line here is read from the server that mints
+ * (nexow-ai/beenzer, server/src/services/nfts/mintNFT.ts and printNFT.ts,
+ * services/auth.ts): Phantom sign-in by signed message, Arweave through Irys,
+ * Metaplex programmable NFTs with limited prints, 10% royalties split 80/20.
+ */
+import Icon from './Icon.astro';
+import type { IconName } from '../lib/icons';
+
+const pillars: { icon: IconName; title: string; body: string }[] = [
+  {
+    icon: 'fingerprint',
+    title: 'Sign in with a signature',
+    body: 'Connect Phantom and sign a one-time message. No email, and no password to leak.',
+  },
+  {
+    icon: 'hard-drive',
+    title: 'Kept on Arweave',
+    body: 'The photo, video or sound and its metadata go to Arweave, storage built to last. Videos get an animated preview.',
+  },
+  {
+    icon: 'layers',
+    title: 'Limited editions',
+    body: 'Each mint is a Metaplex programmable NFT in the Beenzer collection, with as many editions as you choose.',
+  },
+  {
+    icon: 'coins',
+    title: 'Royalties that travel',
+    body: 'A 10% royalty on resales, 80% of it to the creator and 20% to Beenzer, enforced by a Metaplex rule set.',
+  },
+];
+
+const pipeline = [
+  'You approve in Phantom',
+  'Payment confirmed',
+  'Media to Arweave',
+  'Metadata to Arweave',
+  'NFT minted',
+  'Collection verified',
+  'Edition #1 to you',
+];
+
+const stack: { name: string; role: string; icon?: IconName }[] = [
+  { name: 'Solana', role: 'Chain', icon: 'brand-solana' },
+  { name: 'Metaplex', role: 'NFT standard' },
+  { name: 'Arweave', role: 'Storage' },
+  { name: 'Phantom', role: 'Wallet', icon: 'wallet' },
+  { name: 'Flutter', role: 'iOS & Android', icon: 'brand-flutter' },
+  { name: 'Google Maps', role: 'The map', icon: 'brand-googlemaps' },
+  { name: 'Node.js', role: 'Server', icon: 'brand-nodedotjs' },
+];
+---
+
+<section class="onchain section" id="onchain" aria-labelledby="onchain-title">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="container">
+    <div class="head">
+      <p class="eyebrow" data-reveal>On-chain, when you want it</p>
+      <h2 class="h2" id="onchain-title" data-split>Your wallet is your account.</h2>
+      <p class="lead" data-reveal>
+        Beenzer runs on Solana. Signing in and minting both happen in Phantom, and nothing moves without your
+        signature.
+      </p>
+    </div>
+
+    <ul class="pillars" role="list">
+      {
+        pillars.map((p, i) => (
+          <li class="pillar card" data-reveal style={`--i:${i}`}>
+            <span class="pillar-icon">
+              <Icon name={p.icon} size={22} />
+            </span>
+            <h3 class="pillar-title">{p.title}</h3>
+            <p class="body">{p.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="pipe card" data-pipe data-reveal>
+      <div class="pipe-head">
+        <p class="mono pipe-kicker">What happens when you mint</p>
+        <p class="body">Mints wait in a queue. You follow each step live in your inbox.</p>
+      </div>
+      <ol class="pipe-steps" role="list">
+        {
+          pipeline.map((step, i) => (
+            <li style={`--i:${i}`}>
+              <span class="node" aria-hidden="true" />
+              <span class="mono">{step}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="stack" aria-labelledby="stack-title">
+      <p class="mono stack-title" id="stack-title">Built with</p>
+      <ul role="list">
+        {
+          stack.map((s) => (
+            <li>
+              {s.icon ? <Icon name={s.icon} size={22} /> : <span class="mark" aria-hidden="true">{s.name[0]}</span>}
+              <span>
+                <b>{s.name}</b>
+                <span class="mono">{s.role}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .onchain {
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+    background:
+      radial-gradient(60% 50% at 80% 0%, rgb(19 152 185 / 0.12), transparent 70%),
+      linear-gradient(180deg, var(--bg-raise), var(--bg));
+  }
+  .glow {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    width: 900px;
+    height: 900px;
+    translate: -50% -50%;
+    background: radial-gradient(closest-side, rgb(171 159 242 / 0.08), transparent);
+    pointer-events: none;
+  }
+  .head {
+    display: grid;
+    gap: 22px;
+    max-width: 52rem;
+  }
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: clamp(48px, 7vw, 88px);
+  }
+  .pillar {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    padding: 28px 24px;
+    transition:
+      box-shadow 0.4s,
+      transform 0.6s var(--ease-out);
+  }
+  .pillar:hover {
+    transform: translateY(-4px);
+    box-shadow: inset 0 0 0 1px rgb(22 253 130 / 0.35);
+  }
+  .pillar-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgb(22 253 130 / 0.08);
+    color: var(--neon);
+    box-shadow: inset 0 0 0 1px rgb(22 253 130 / 0.25);
+  }
+  .pillar-title {
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .pillar .body {
+    font-size: 0.98rem;
+  }
+
+  .pipe {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+    gap: 32px;
+    align-items: center;
+    margin-top: 16px;
+    padding: 32px;
+  }
+  .pipe-head {
+    display: grid;
+    gap: 8px;
+  }
+  .pipe-kicker {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--neon);
+  }
+  .pipe-steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pipe-steps::before,
+  .pipe-steps::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    right: calc(100% / 7 - 7px);
+    top: 7px;
+    height: 2px;
+    background: var(--line-strong);
+  }
+  .pipe-steps::after {
+    background: var(--grad);
+    transform-origin: left;
+    transform: scaleX(0);
+    box-shadow: 0 0 12px rgb(22 253 130 / 0.6);
+  }
+  [data-pipe][data-run] .pipe-steps::after {
+    transition: transform 4.2s linear;
+    transform: scaleX(1);
+  }
+  .pipe-steps li {
+    position: relative;
+    display: grid;
+    gap: 14px;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--text-3);
+  }
+  .node {
+    position: relative;
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 2px var(--line-strong);
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s;
+  }
+  [data-pipe][data-run] .pipe-steps li {
+    animation: lit 0.3s both;
+    animation-delay: calc(var(--i) * 0.6s);
+  }
+  [data-pipe][data-run] .node {
+    animation: node 0.3s both;
+    animation-delay: calc(var(--i) * 0.6s);
+  }
+  @keyframes lit {
+    to {
+      color: var(--text);
+    }
+  }
+  @keyframes node {
+    to {
+      background: var(--neon);
+      box-shadow:
+        0 0 0 4px rgb(22 253 130 / 0.18),
+        0 0 16px var(--neon);
+    }
+  }
+
+  .stack {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: center;
+    margin-top: clamp(56px, 8vw, 96px);
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .stack-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .stack ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 32px;
+    justify-content: space-between;
+  }
+  .stack li {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    color: var(--text-2);
+  }
+  .stack li > span {
+    display: grid;
+    line-height: 1.2;
+  }
+  .stack b {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .stack .mono {
+    font-size: 0.7rem;
+    color: var(--text-3);
+  }
+  .mark {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1.5px currentColor;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 1100px) {
+    .pillars {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .pipe {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 720px) {
+    .pillars {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pipe {
+      padding: 24px;
+    }
+    .pipe-steps {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+    }
+    .pipe-steps::before,
+    .pipe-steps::after {
+      left: 7px;
+      right: auto;
+      top: 7px;
+      bottom: 7px;
+      width: 2px;
+      height: auto;
+    }
+    .pipe-steps::after {
+      transform-origin: top;
+      transform: scaleY(0);
+    }
+    [data-pipe][data-run] .pipe-steps::after {
+      transform: scaleY(1);
+    }
+    .pipe-steps li {
+      grid-template-columns: 16px 1fr;
+      align-items: center;
+    }
+    .stack {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .stack ul {
+      justify-content: start;
+    }
+  }
+</style>
+
+<script>
+  // The pipeline runs once, when it scrolls into view.
+  document.querySelectorAll<HTMLElement>('[data-pipe]').forEach((pipe) => {
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        pipe.setAttribute('data-run', '');
+        io.disconnect();
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(pipe);
+  });
+</script>

@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+
+// A small field of dots with one empty spot where the page should have been.
+const dots = Array.from({ length: 21 * 9 }, (_, i) => ({ x: i % 21, y: Math.floor(i / 21) }));
+---
+
+<Base title="Nothing pinned here" description="This page does not exist." noindex>
+  <section class="lost container">
+    <div class="field" aria-hidden="true">
+      {
+        dots.map((d) => (
+          <i
+            class:list={{ gone: Math.abs(d.x - 10) + Math.abs(d.y - 4) < 2 }}
+            style={`--x:${d.x};--y:${d.y};--d:${((d.x * 7 + d.y * 13) % 20) / 10}s`}
+          />
+        ))
+      }
+      <span class="pin"></span>
+    </div>
+    <p class="mono code">404 · Lat ?? · Lon ??</p>
+    <h1 class="display">Nothing was pinned here.</h1>
+    <p class="lead">The page you are looking for has moved, or it was never posted.</p>
+    <div class="actions">
+      <a class="btn" href="/">Back to the map <Icon name="arrow-right" /></a>
+      <a class="btn ghost" href="/journal/">Read the journal</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost {
+    display: grid;
+    justify-items: center;
+    gap: 24px;
+    min-height: 100svh;
+    align-content: center;
+    padding-top: calc(var(--header-h) + 40px);
+    padding-bottom: 96px;
+    text-align: center;
+  }
+  .field {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(21, 14px);
+    gap: 10px;
+    margin-bottom: 24px;
+    mask-image: radial-gradient(closest-side, #000 40%, transparent);
+  }
+  .field i {
+    width: 6px;
+    height: 6px;
+    margin: 4px;
+    border-radius: 50%;
+    background: #3f3f46;
+    animation: twinkle 3s ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  .field i.gone {
+    visibility: hidden;
+  }
+  @keyframes twinkle {
+    50% {
+      background: #71717a;
+    }
+  }
+  .pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 28px;
+    height: 28px;
+    translate: -50% -80%;
+    rotate: -45deg;
+    border-radius: 50% 50% 50% 3px;
+    box-shadow: inset 0 0 0 2px var(--neon);
+    animation: hover 2.4s ease-in-out infinite;
+  }
+  @keyframes hover {
+    50% {
+      translate: -50% -100%;
+    }
+  }
+  .code {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--neon);
+  }
+  .lost .display {
+    font-size: clamp(2.4rem, 6vw, 5.5rem);
+    max-width: 14ch;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  @media (max-width: 520px) {
+    .field {
+      grid-template-columns: repeat(21, 6px);
+      gap: 6px;
+    }
+    .field i {
+      width: 4px;
+      height: 4px;
+      margin: 1px;
+    }
+  }
+</style>

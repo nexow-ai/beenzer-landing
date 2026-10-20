@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import JournalCards from '../../components/JournalCards.astro';
+
+const posts = (await getCollection('journal')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime() || a.data.kind.localeCompare(b.data.kind),
+);
+---
+
+<Base title="Journal" description="News from Beenzer, and guides to geo-NFTs, Solana and the app.">
+  <section class="page container">
+    <header class="head">
+      <p class="eyebrow">Journal</p>
+      <h1 class="display" data-split>Notes from the map.</h1>
+      <p class="lead">News about the app, and guides to what is under it.</p>
+    </header>
+    <JournalCards posts={posts} level={2} />
+  </section>
+</Base>
+
+<style>
+  .page {
+    padding-top: calc(var(--header-h) + clamp(64px, 10vw, 140px));
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .head {
+    display: grid;
+    gap: 24px;
+    margin-bottom: clamp(48px, 7vw, 96px);
+  }
+  .head .display {
+    font-size: clamp(2.6rem, 6.4vw, 6.5rem);
+    max-width: 12ch;
+  }
+</style>

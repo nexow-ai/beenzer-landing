@@ -1,0 +1,55 @@
+---
+/**
+ * The Beenzer mark, traced from the app's artwork (client/assets/New_Artwork_e.png):
+ * a pin standing on a folded map. The wordmark is set in the display face.
+ */
+interface Props {
+  /** Show the wordmark next to the mark. */
+  word?: boolean;
+  size?: number;
+  class?: string;
+}
+
+const { word = true, size = 30, class: className } = Astro.props;
+---
+
+<span class:list={['logo', className]} style={`--logo-size:${size}px`}>
+  <svg class="mark" viewBox="0 0 100 106" width={size} height={size * 1.06} aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M18.4 68.4H82.4L97.6 102.4H2.4Z"></path>
+      <path d="M35 68.4L34.4 102.4"></path>
+      <path d="M3.4 87C12 80 22 72 34 76C44 79 48 88 58 92C68 96 80 97 86 92C92 87 90 81 82 80.5C74 80 68 77.5 66.5 72.5V68.4"
+      ></path>
+    </g>
+    <path
+      fill="currentColor"
+      fill-rule="evenodd"
+      d="M50 86.5L26.6 40.4A25.6 25.6 0 1 1 73.4 40.4ZM50 19.4A8.6 8.6 0 1 0 50 36.6A8.6 8.6 0 1 0 50 19.4Z"
+    ></path>
+  </svg>
+  {word && <span class="word">BEENZER</span>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--logo-size) * 0.32);
+    color: var(--neon);
+  }
+  .mark {
+    flex: none;
+    filter: drop-shadow(0 0 10px rgb(22 253 130 / 0.35));
+  }
+  .word {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: calc(var(--logo-size) * 0.62);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>

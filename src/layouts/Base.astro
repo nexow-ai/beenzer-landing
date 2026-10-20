@@ -1,0 +1,127 @@
+---
+import '@fontsource-variable/unbounded';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+import unboundedLatin from '@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2?url';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE, SOCIAL } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Path under /public, or an absolute URL. */
+  image?: string;
+  type?: 'website' | 'article';
+  published?: string;
+  noindex?: boolean;
+  /** Extra JSON-LD nodes for this page. */
+  schema?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = SITE.description,
+  image = '/og.jpg',
+  type = 'website',
+  published,
+  noindex = false,
+  schema = [],
+} = Astro.props;
+
+const fullTitle = title ? `${title} · Beenzer` : `Beenzer · ${SITE.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const imageUrl = new URL(image, Astro.site).href;
+
+const org = {
+  '@type': 'Organization',
+  '@id': `${SITE.owner.url}/#org`,
+  name: SITE.owner.name,
+  url: SITE.owner.url,
+  logo: `${SITE.url}/nexow-white.png`,
+  foundingDate: SITE.owner.incorporated,
+  founder: SITE.owner.founders.map((name) => ({ '@type': 'Person', name })),
+};
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    org,
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE.url}/#site`,
+      name: SITE.name,
+      url: SITE.url,
+      publisher: { '@id': org['@id'] },
+    },
+    {
+      '@type': 'MobileApplication',
+      '@id': `${SITE.url}/#app`,
+      name: SITE.name,
+      description: SITE.description,
+      operatingSystem: 'iOS, Android',
+      applicationCategory: 'SocialNetworkingApplication',
+      url: SITE.url,
+      publisher: { '@id': org['@id'] },
+      sameAs: SOCIAL.map((s) => s.href),
+    },
+    ...schema,
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#050506" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="author" content={SITE.owner.name} />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href={unboundedLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+    {published && <meta property="article:published_time" content={published} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={SITE.x} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(graph)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import { startMotion } from '../scripts/motion';
+      startMotion();
+    </script>
+  </body>
+</html>

@@ -134,7 +134,7 @@ const article = {
     text-underline-offset: 3px;
   }
   .prose :global(ul) {
-    padding-left: 1.2em;
+    padding-inline-start: 1.2em;
   }
   .prose :global(li + li) {
     margin-top: 0.6em;
@@ -170,9 +170,10 @@ const article = {
   }
   .prose :global(th),
   .prose :global(td) {
-    padding: 10px 14px 10px 0;
+    padding-block: 10px;
+    padding-inline: 0 14px;
     border-bottom: 1px solid var(--line);
-    text-align: left;
+    text-align: start;
     vertical-align: top;
   }
   .prose :global(th) {

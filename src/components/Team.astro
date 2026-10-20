@@ -3,29 +3,27 @@ import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import { team } from '../data/team';
 import { SITE } from '../data/site';
+import { fill, rich, useLocale } from '../i18n';
 
-const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const { t } = useLocale(Astro.url);
 const countries = new Set(team.map((m) => m.country)).size;
+const lead = fill(t.team.lead, { count: t.team.numbers[countries] ?? countries, company: SITE.owner.name });
+const role = (name: string) => t.team.roles[name as keyof typeof t.team.roles] ?? name;
 ---
 
 <section class="team section" id="team" aria-labelledby="team-title">
   <div class="container">
     <div class="head">
-      <p class="eyebrow" data-reveal>The crew</p>
-      <h2 class="h2" id="team-title" data-split>Engineers, traders, artists. Believers.</h2>
-      <p class="lead" data-reveal>
-        The first Beenzer was built by an international crew: software, data, finance and art, from{' '}
-        {words[countries] ?? countries} countries. Today it is built at{' '}
-        <a class="link" href={SITE.owner.url} target="_blank" rel="noopener">{SITE.owner.name}</a>, founded by two of
-        them.
-      </p>
+      <p class="eyebrow" data-reveal>{t.team.eyebrow}</p>
+      <h2 class="h2" id="team-title" data-split>{t.team.title}</h2>
+      <p class="lead" data-reveal set:html={rich(lead, { company: SITE.owner.url })} />
     </div>
 
     <ul class="grid" role="list">
       {
         team.map((m) => (
           <li class:list={['member', { founder: m.nexow }]} data-reveal>
-            <a href={m.href} target="_blank" rel="noopener" aria-label={`${m.name}, profile`}>
+            <a href={m.href} target="_blank" rel="noopener" aria-label={fill(t.team.profile, { name: m.name })}>
               <span class="photo">
                 <Image src={m.photo} alt="" widths={[160, 320]} sizes="160px" loading="lazy" />
               </span>
@@ -35,12 +33,12 @@ const countries = new Set(team.map((m) => m.country)).size;
                   <Icon name="arrow-up-right" size={14} />
                 </span>
                 <span class="role">
-                  {m.role} · {m.also}
+                  {role(m.role)} · {role(m.also)}
                 </span>
                 <span class="before mono">
-                  <span class="cc">{m.country}</span> {m.before}
+                  <span class="cc">{m.country}</span> <span lang="en">{m.before}</span>
                 </span>
-                {m.nexow && <span class="tag mono">{m.nexow}</span>}
+                {m.nexow && <span class="tag mono">{role(m.nexow)}</span>}
               </span>
             </a>
           </li>

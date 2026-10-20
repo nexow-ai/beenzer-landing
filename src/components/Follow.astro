@@ -2,7 +2,9 @@
 import Icon from './Icon.astro';
 import { SITE, SOCIAL } from '../data/site';
 import type { IconName } from '../lib/icons';
+import { rich, useLocale } from '../i18n';
 
+const { t } = useLocale(Astro.url);
 const channels = SOCIAL.filter((s) => s.icon !== 'github');
 // A field of pins behind the headline, placed once at build time.
 const pins = Array.from({ length: 26 }, (_, i) => ({
@@ -20,18 +22,14 @@ const pins = Array.from({ length: 26 }, (_, i) => ({
   <div class="container inner">
     <p class="chip" data-reveal>
       <span class="live-dot" aria-hidden="true"></span>
-      In the works
+      {t.follow.chip}
     </p>
-    <h2 class="display title" id="follow-title" data-split>
-      Be there when it <span class="grad-text">lands.</span>
-    </h2>
-    <p class="lead" data-reveal>
-      The new Beenzer is coming to iPhone and Android. Follow along for the first look, the beta, and the day it ships.
-    </p>
+    <h2 class="display title" id="follow-title" data-split set:html={rich(t.follow.title)} />
+    <p class="lead" data-reveal>{t.follow.lead}</p>
 
     <div class="platforms" data-reveal>
-      <span class="platform"><Icon name="brand-apple" size={20} /> iOS <em class="mono">in the works</em></span>
-      <span class="platform"><Icon name="brand-android" size={20} /> Android <em class="mono">in the works</em></span>
+      <span class="platform"><Icon name="brand-apple" size={20} /> iOS <em class="mono">{t.follow.status}</em></span>
+      <span class="platform"><Icon name="brand-android" size={20} /> Android <em class="mono">{t.follow.status}</em></span>
     </div>
 
     <ul class="channels" role="list">
@@ -51,10 +49,7 @@ const pins = Array.from({ length: 26 }, (_, i) => ({
       }
     </ul>
 
-    <p class="press body" data-reveal>
-      Press, partners or investors:{' '}
-      <a class="link" href={SITE.owner.contact} target="_blank" rel="noopener">write to Nexow</a>.
-    </p>
+    <p class="press body" data-reveal set:html={rich(t.follow.press, { contact: SITE.owner.contact })} />
   </div>
 </section>
 

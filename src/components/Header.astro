@@ -405,7 +405,7 @@ const nav = [
     langPanel.querySelector<HTMLAnchorElement>('[aria-current]')?.focus();
   }
 
-  langButton.addEventListener('click', () => setLang(langPanel.hidden));
+  langButton.addEventListener('click', () => setLang(langButton.getAttribute('aria-expanded') !== 'true'));
   document.addEventListener('click', (e) => {
     if (!langPanel.hidden && !(e.target as Element | null)?.closest('[data-lang]')) setLang(false);
   });

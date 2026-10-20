@@ -1,21 +1,21 @@
 ---
 import { SITE } from '../data/site';
 import { faq } from '../data/faq';
+import { rich, useLocale } from '../i18n';
+
+const { locale, t } = useLocale(Astro.url);
 ---
 
 <section class="faq section" id="faq" aria-labelledby="faq-title">
   <div class="container grid">
     <div class="head">
-      <p class="eyebrow" data-reveal>FAQ</p>
-      <h2 class="h2" id="faq-title" data-split>Good questions.</h2>
-      <p class="body" data-reveal>
-        Something else? Write to us through{' '}
-        <a class="link" href={SITE.owner.contact} target="_blank" rel="noopener">Nexow</a>.
-      </p>
+      <p class="eyebrow" data-reveal>{t.faq.eyebrow}</p>
+      <h2 class="h2" id="faq-title" data-split>{t.faq.title}</h2>
+      <p class="body" data-reveal set:html={rich(t.faq.more, { contact: SITE.owner.contact })} />
     </div>
     <div class="list">
       {
-        faq.map((f, i) => (
+        faq(locale).map((f, i) => (
           <details class="item" name="faq" data-reveal open={i === 0}>
             <summary>
               <span>{f.q}</span>

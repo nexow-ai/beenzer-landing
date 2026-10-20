@@ -1,37 +1,43 @@
 ---
-import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
+import { fill, useLocale } from '../i18n';
+import type { Post } from '../i18n/journal';
 
 interface Props {
-  posts: CollectionEntry<'journal'>[];
+  posts: Post[];
   /** Heading level of each card's title, one below the section it sits in. */
   level?: 2 | 3;
 }
 
 const { posts, level = 3 } = Astro.props;
+const { t, path, date } = useLocale(Astro.url);
 const Title = `h${level}` as 'h2' | 'h3';
-const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const fmt = (d: Date) => date(d, { day: 'numeric', month: 'short', year: 'numeric' });
 ---
 
 <ul class="cards" role="list">
   {
-    posts.map((post, i) => (
+    posts.map(({ slug, entry: post, fallback }, i) => (
       <li data-reveal>
-        <a class="card post" href={`/journal/${post.id}/`}>
+        <a class="card post" href={path(`/journal/${slug}/`)}>
           <span class="art" aria-hidden="true" style={`--h:${i}`}>
             <i />
             <i />
             <i />
           </span>
           <span class="meta mono">
-            <span class="kind">{post.data.kind}</span>
+            <span class="kind">{t.journal.kinds[post.data.kind]}</span>
             <span>{fmt(post.data.date)}</span>
-            <span>{post.data.read} min</span>
+            <span>{fill(t.journal.minutes, { n: post.data.read })}</span>
           </span>
-          <Title class="h3">{post.data.title}</Title>
-          <p class="body">{post.data.description}</p>
+          <Title class="h3" lang={fallback ? 'en' : undefined}>
+            {post.data.title}
+          </Title>
+          <p class="body" lang={fallback ? 'en' : undefined}>
+            {post.data.description}
+          </p>
           <span class="more">
-            Read <Icon name="arrow-right" size={16} />
+            {t.journal.read} <Icon name="arrow-right" size={16} />
           </span>
         </a>
       </li>

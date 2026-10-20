@@ -1,47 +1,23 @@
 ---
 import Icon from './Icon.astro';
+import { useLocale } from '../i18n';
+
+const { t, date } = useLocale(Astro.url);
+const month = (iso: string) => date(new Date(`${iso}-01T00:00:00Z`), { month: 'short', year: 'numeric' });
+const day = (iso: string) => date(new Date(`${iso}T00:00:00Z`), { day: 'numeric', month: 'short', year: 'numeric' });
 
 // Dates: nexow.studio's project log (src/data/log.ts there) and, for #18,
-// the token's own metadata.
-const timeline = [
-  {
-    when: 'Nov 2022',
-    title: 'Beenzer starts',
-    body: 'A mobile dApp on Solana, built in React Native: snap, mint, drop it on the map.',
-  },
-  {
-    when: '16 Feb 2023',
-    title: 'BEENZER #18',
-    body: 'Minted in Savigny, Switzerland. Still on-chain, still on Arweave, still the post this page lands on.',
-  },
-  {
-    when: 'Oct 2026',
-    title: 'A new home at Nexow',
-    body: 'Beenzer becomes a product of Nexow, Inc. and gets a fresh codebase.',
-  },
-  {
-    when: 'Now',
-    title: 'Rebuilt in Flutter',
-    body: 'A new app for iOS and Android, on the same server: map, feed, chat, camera and mint, in light and dark.',
-    live: true,
-  },
-  {
-    when: 'Next',
-    title: 'Launch',
-    body: 'In the App Store and on Google Play. Follow along to be there when it lands.',
-  },
-];
+// the token's own metadata. The words are in the dictionary (story.timeline), in this order.
+const when = [month('2022-11'), day('2023-02-16'), month('2026-10'), t.story.now, t.story.next];
+const timeline = t.story.timeline.map((entry, i) => ({ when: when[i], live: i === 3, ...entry }));
 ---
 
 <section class="story section" id="story" aria-labelledby="story-title" data-anim>
   <div class="container grid">
     <div class="copy">
-      <p class="eyebrow" data-reveal>Story</p>
-      <h2 class="h2" id="story-title" data-split>Been here since 2022.</h2>
-      <p class="lead" data-reveal>
-        Beenzer began in 2022 as a social app that minted straight from the phone camera, on Solana. Now it is being
-        rebuilt from the ground up, around the same idea: every moment keeps its place.
-      </p>
+      <p class="eyebrow" data-reveal>{t.story.eyebrow}</p>
+      <h2 class="h2" id="story-title" data-split>{t.story.title}</h2>
+      <p class="lead" data-reveal>{t.story.lead}</p>
 
       <ol class="timeline" role="list">
         {
@@ -70,15 +46,15 @@ const timeline = [
           preload="none"
           data-poster="/media/original-app.webp"
           data-src="/media/original-app.mp4"
-          aria-label="A walkthrough of the original Beenzer app"
+          aria-label={t.story.video}
           data-story-video></video>
         <button class="sound" type="button" data-sound aria-pressed="false">
           <Icon name="volume-x" size={16} class="off" />
           <Icon name="volume-2" size={16} class="on" />
-          <span>Sound</span>
+          <span>{t.story.sound}</span>
         </button>
       </div>
-      <figcaption class="mono">The original app, in React Native</figcaption>
+      <figcaption class="mono">{t.story.caption}</figcaption>
     </figure>
   </div>
 </section>

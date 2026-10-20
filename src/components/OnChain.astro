@@ -7,48 +7,25 @@
  */
 import Icon from './Icon.astro';
 import type { IconName } from '../lib/icons';
+import { useLocale } from '../i18n';
 
-const pillars: { icon: IconName; title: string; body: string }[] = [
-  {
-    icon: 'fingerprint',
-    title: 'Sign in with a signature',
-    body: 'Connect Phantom and sign a one-time message. No email, and no password to leak.',
-  },
-  {
-    icon: 'hard-drive',
-    title: 'Kept on Arweave',
-    body: 'The photo, video or sound and its metadata go to Arweave, storage built to last. Videos get an animated preview.',
-  },
-  {
-    icon: 'layers',
-    title: 'Limited editions',
-    body: 'Each mint is a Metaplex programmable NFT in the Beenzer collection, with as many editions as you choose.',
-  },
-  {
-    icon: 'coins',
-    title: 'Royalties that travel',
-    body: 'A 10% royalty on resales, 80% of it to the creator and 20% to Beenzer, enforced by a Metaplex rule set.',
-  },
-];
+const { t } = useLocale(Astro.url);
+const roles = t.onchain.roles;
 
-const pipeline = [
-  'You approve in Phantom',
-  'Payment confirmed',
-  'Media to Arweave',
-  'Metadata to Arweave',
-  'NFT minted',
-  'Collection verified',
-  'Edition #1 to you',
-];
+// The words are in the dictionary (onchain.pillars), in this order.
+const icons: IconName[] = ['fingerprint', 'hard-drive', 'layers', 'coins'];
+const pillars = t.onchain.pillars.map((p, i) => ({ icon: icons[i]!, ...p }));
+
+const pipeline = t.onchain.pipeline;
 
 const stack: { name: string; role: string; icon?: IconName }[] = [
-  { name: 'Solana', role: 'Chain', icon: 'brand-solana' },
-  { name: 'Metaplex', role: 'NFT standard' },
-  { name: 'Arweave', role: 'Storage' },
-  { name: 'Phantom', role: 'Wallet', icon: 'wallet' },
-  { name: 'Flutter', role: 'iOS & Android', icon: 'brand-flutter' },
-  { name: 'Google Maps', role: 'The map', icon: 'brand-googlemaps' },
-  { name: 'Node.js', role: 'Server', icon: 'brand-nodedotjs' },
+  { name: 'Solana', role: roles.chain, icon: 'brand-solana' },
+  { name: 'Metaplex', role: roles.nft },
+  { name: 'Arweave', role: roles.storage },
+  { name: 'Phantom', role: roles.wallet, icon: 'wallet' },
+  { name: 'Flutter', role: roles.apps, icon: 'brand-flutter' },
+  { name: 'Google Maps', role: roles.map, icon: 'brand-googlemaps' },
+  { name: 'Node.js', role: roles.server, icon: 'brand-nodedotjs' },
 ];
 ---
 
@@ -56,12 +33,9 @@ const stack: { name: string; role: string; icon?: IconName }[] = [
   <div class="glow" aria-hidden="true"></div>
   <div class="container">
     <div class="head">
-      <p class="eyebrow" data-reveal>On-chain</p>
-      <h2 class="h2" id="onchain-title" data-split>Your wallet is your account.</h2>
-      <p class="lead" data-reveal>
-        Beenzer runs on Solana. Signing in and minting both happen in Phantom, and nothing moves without your
-        signature.
-      </p>
+      <p class="eyebrow" data-reveal>{t.onchain.eyebrow}</p>
+      <h2 class="h2" id="onchain-title" data-split>{t.onchain.title}</h2>
+      <p class="lead" data-reveal>{t.onchain.lead}</p>
     </div>
 
     <ul class="pillars" role="list">
@@ -80,8 +54,8 @@ const stack: { name: string; role: string; icon?: IconName }[] = [
 
     <div class="pipe card" data-pipe data-reveal>
       <div class="pipe-head">
-        <p class="mono pipe-kicker">What happens when you mint</p>
-        <p class="body">Mints wait in a queue. You follow each step live in your inbox.</p>
+        <p class="mono pipe-kicker">{t.onchain.pipeTitle}</p>
+        <p class="body">{t.onchain.pipeBody}</p>
       </div>
       <ol class="pipe-steps" role="list">
         {
@@ -96,7 +70,7 @@ const stack: { name: string; role: string; icon?: IconName }[] = [
     </div>
 
     <div class="stack" aria-labelledby="stack-title">
-      <p class="mono stack-title" id="stack-title">Built with</p>
+      <p class="mono stack-title" id="stack-title">{t.onchain.built}</p>
       <ul role="list">
         {
           stack.map((s) => (

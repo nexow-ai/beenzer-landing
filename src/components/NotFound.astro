@@ -1,12 +1,16 @@
 ---
+/** The 404 page, in the language of the path it is served under (src/pages/404.astro, src/pages/[lang]/404.astro). */
 import Base from '../layouts/Base.astro';
-import Icon from '../components/Icon.astro';
+import Icon from './Icon.astro';
+import { useLocale } from '../i18n';
+
+const { t, path } = useLocale(Astro.url);
 
 // A small field of dots with one empty spot where the page should have been.
 const dots = Array.from({ length: 21 * 9 }, (_, i) => ({ x: i % 21, y: Math.floor(i / 21) }));
 ---
 
-<Base title="Nothing pinned here" description="This page does not exist." noindex>
+<Base title={t.notFound.title} description={t.notFound.description} noindex>
   <section class="lost container">
     <div class="field" aria-hidden="true">
       {
@@ -19,12 +23,12 @@ const dots = Array.from({ length: 21 * 9 }, (_, i) => ({ x: i % 21, y: Math.floo
       }
       <span class="pin"></span>
     </div>
-    <p class="mono code">404 · Lat ?? · Lon ??</p>
-    <h1 class="display">Nothing was pinned here.</h1>
-    <p class="lead">The page you are looking for has moved, or it was never posted.</p>
+    <p class="mono code">{t.notFound.code}</p>
+    <h1 class="display">{t.notFound.heading}</h1>
+    <p class="lead">{t.notFound.lead}</p>
     <div class="actions">
-      <a class="btn" href="/">Back to the map <Icon name="arrow-right" /></a>
-      <a class="btn ghost" href="/journal/">Read the journal</a>
+      <a class="btn" href={path('/')}>{t.notFound.home} <Icon name="arrow-right" /></a>
+      <a class="btn ghost" href={path('/journal/')}>{t.notFound.journal}</a>
     </div>
   </section>
 </Base>

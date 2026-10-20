@@ -2,30 +2,35 @@
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { FEATURED, SITE, SOCIAL, formatLat, formatLon } from '../data/site';
+import { LOCALES, fill, localizePath, unlocalizePath, useLocale } from '../i18n';
+
+const { locale, t, path } = useLocale(Astro.url);
+const page = unlocalizePath(Astro.url.pathname);
+const here = page.startsWith('/404') ? '/' : page;
 
 const year = new Date().getFullYear();
 const columns = [
   {
     title: 'Beenzer',
     links: [
-      { label: 'How it works', href: '/#how' },
-      { label: 'On-chain', href: '/#onchain' },
-      { label: 'Story', href: '/#story' },
-      { label: 'Journal', href: '/journal/' },
-      { label: 'FAQ', href: '/#faq' },
+      { label: t.nav.how, href: path('/#how') },
+      { label: t.nav.onchain, href: path('/#onchain') },
+      { label: t.nav.story, href: path('/#story') },
+      { label: t.nav.journal, href: path('/journal/') },
+      { label: t.nav.faq, href: path('/#faq') },
     ],
   },
   {
-    title: 'Community',
+    title: t.footer.community,
     links: SOCIAL.map((s) => ({ label: s.label, href: s.href, external: true })),
   },
   {
-    title: 'Company',
+    title: t.footer.company,
     links: [
-      { label: 'Nexow Studio', href: SITE.owner.url, external: true },
-      { label: 'Beenzer at Nexow', href: SITE.owner.product, external: true },
-      { label: 'Contact', href: SITE.owner.contact, external: true },
-      { label: 'Site notice', href: '/legal/' },
+      { label: t.footer.studio, href: SITE.owner.url, external: true },
+      { label: t.footer.atNexow, href: SITE.owner.product, external: true },
+      { label: t.footer.contact, href: SITE.owner.contact, external: true },
+      { label: t.footer.notice, href: path('/legal/') },
     ],
   },
 ];
@@ -34,12 +39,9 @@ const columns = [
 <footer class="site-footer">
   <div class="container top">
     <div class="intro">
-      <a href="/" aria-label="Beenzer, home"><Logo size={34} /></a>
-      <p class="tag">{SITE.tagline}</p>
-      <p class="body">
-        Photos and videos pinned to the place they were taken, and any of them can become a Solana NFT. Rebuilt in
-        Flutter for iOS and Android.
-      </p>
+      <a href={path('/')} aria-label={t.meta.home}><Logo size={34} /></a>
+      <p class="tag" lang="en" translate="no">{SITE.tagline}</p>
+      <p class="body">{t.footer.body}</p>
     </div>
     {
       columns.map((col) => (
@@ -63,22 +65,40 @@ const columns = [
     }
   </div>
 
+  <nav class="container languages" aria-label={t.footer.languages}>
+    <p class="col-title mono">{t.footer.languages}</p>
+    <ul role="list">
+      {
+        LOCALES.map((l) => (
+          <li>
+            <a
+              href={localizePath(here, l.code)}
+              hreflang={l.lang}
+              lang={l.lang}
+              aria-current={l.code === locale ? 'true' : undefined}
+            >
+              {l.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
   <div class="container owner">
     <a class="nexow" href={SITE.owner.url} target="_blank" rel="noopener">
-      <span class="mono">A product of</span>
+      <span class="mono">{t.footer.productOf}</span>
       <img src="/nexow-white.png" alt="Nexow" width="104" height="64" loading="lazy" decoding="async" />
     </a>
-    <p class="legal">
-      © {year} {SITE.owner.name} All rights reserved. Beenzer is a product of {SITE.owner.name}, a Delaware corporation.
-    </p>
-    <p class="mono sign">
+    <p class="legal">{fill(t.footer.legal, { year, company: SITE.owner.name })}</p>
+    <p class="mono sign" dir="ltr">
       <span>{formatLat(FEATURED.latitude, 2)}</span>
       <span>{formatLon(FEATURED.longitude, 2)}</span>
       <span>v{SITE.version}</span>
     </p>
   </div>
 
-  <div class="giant" aria-hidden="true">
+  <div class="giant" aria-hidden="true" lang="en">
     <span>BEENZER</span>
   </div>
 </footer>
@@ -135,12 +155,34 @@ const columns = [
   .col a:hover {
     color: var(--neon);
   }
+  .languages {
+    margin-top: clamp(48px, 7vw, 80px);
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .languages ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 22px;
+  }
+  .languages a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    font-size: 0.92rem;
+    color: var(--text-2);
+    transition: color 0.2s;
+  }
+  .languages a:hover,
+  .languages a[aria-current] {
+    color: var(--neon);
+  }
   .owner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 16px 32px;
-    margin-top: clamp(56px, 8vw, 96px);
+    margin-top: 28px;
     padding-block: 28px;
     border-top: 1px solid var(--line);
     font-size: 0.85rem;

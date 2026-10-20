@@ -27,7 +27,13 @@ const { word = true, size = 30, class: className } = Astro.props;
       d="M50 86.5L26.6 40.4A25.6 25.6 0 1 1 73.4 40.4ZM50 19.4A8.6 8.6 0 1 0 50 36.6A8.6 8.6 0 1 0 50 19.4Z"
     ></path>
   </svg>
-  {word && <span class="word">BEENZER</span>}
+  {
+    word && (
+      <span class="word" lang="en" translate="no">
+        BEENZER
+      </span>
+    )
+  }
 </span>
 
 <style>

@@ -376,6 +376,7 @@ const nl: Dict = {
           'Deze site plaatst geen cookies, gebruikt geen analytics, advertenties of trackers en heeft geen formulieren. Lettertypen, afbeeldingen, video’s en de kaartgegevens van de globe komen allemaal van deze site zelf, dus een bezoek stuurt je naar niemand anders.',
           'Zoals bij elke website kan de host die deze pagina’s levert standaard technische logs bijhouden, zoals een IP-adres en een browserversie, om de site draaiende en veilig te houden.',
           'Links naar X, Instagram, YouTube, GitHub, Solscan of Arweave brengen je naar die diensten, en daar geldt hun eigen beleid.',
+          'Kies je een taal, of sla je het aanbod van een andere taal af, dan bewaart je browser die keuze op je apparaat, in de lokale opslag en niet in een cookie. Die keuze wordt nooit naar iemand verstuurd.',
         ],
       },
       {

@@ -381,6 +381,7 @@ const tr: Dict = {
           'Bu site çerez kullanmaz; analiz, reklam ya da izleme araçları çalıştırmaz ve hiçbir form içermez. Yazı tipleri, görseller, videolar ve küredeki harita verileri tamamen bu sitenin kendisinden sunulur; bu yüzden siteyi ziyaret ettiğinizde başka hiç kimseye bağlanmazsınız.',
           'Her web sitesinde olduğu gibi, bu sayfaları sunan barındırma hizmeti, siteyi çalışır ve güvende tutmak için IP adresi ve tarayıcı sürümü gibi standart teknik kayıtlar tutabilir.',
           'X, Instagram, YouTube, GitHub, Solscan veya Arweave bağlantıları sizi bu hizmetlere götürür; orada bu hizmetlerin kendi politikaları geçerlidir.',
+          'Bir dil seçerseniz ya da başka bir dil önerisini reddederseniz, tarayıcınız bu tercihi çerez olarak değil, cihazınızdaki yerel depolamada saklar. Bu tercih hiçbir zaman kimseye gönderilmez.',
         ],
       },
       {

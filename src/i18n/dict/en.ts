@@ -389,6 +389,7 @@ const en = {
           "This site sets no cookies, runs no analytics, ads or trackers, and has no forms. Fonts, images, videos and the globe's map data are all served from this site itself, so visiting it does not send you to anyone else.",
           'Like any website, the host that serves these pages may keep standard technical logs, such as an IP address and a browser version, to keep the site running and safe.',
           'Links to X, Instagram, YouTube, GitHub, Solscan or Arweave take you to those services, and their own policies apply there.',
+          'If you choose a language, or turn down the offer of another one, your browser keeps that choice on your device, in its local storage, not in a cookie. It is never sent to anyone.',
         ],
       },
       {

@@ -381,6 +381,7 @@ const vi: Dict = {
           'Trang web này không đặt cookie, không chạy công cụ phân tích, quảng cáo hay trình theo dõi nào, và không có biểu mẫu. Phông chữ, hình ảnh, video và dữ liệu bản đồ của quả địa cầu đều được phục vụ từ chính trang web này, nên việc truy cập trang không đưa bạn đến bất kỳ bên nào khác.',
           'Như mọi trang web, nhà cung cấp dịch vụ lưu trữ phục vụ các trang này có thể lưu nhật ký kỹ thuật tiêu chuẩn, chẳng hạn như địa chỉ IP và phiên bản trình duyệt, để giữ cho trang web hoạt động và an toàn.',
           'Các liên kết đến X, Instagram, YouTube, GitHub, Solscan hoặc Arweave sẽ đưa bạn đến các dịch vụ đó, và chính sách riêng của họ được áp dụng ở đó.',
+          'Nếu bạn chọn một ngôn ngữ, hoặc từ chối gợi ý đọc bằng ngôn ngữ khác, trình duyệt sẽ lưu lựa chọn đó trên thiết bị của bạn, trong bộ nhớ cục bộ chứ không phải trong cookie. Lựa chọn này không bao giờ được gửi cho bất kỳ ai.',
         ],
       },
       {

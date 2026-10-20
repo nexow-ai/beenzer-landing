@@ -381,6 +381,7 @@ const id: Dict = {
           'Situs ini tidak memasang cookie, tidak menjalankan analitik, iklan, atau pelacak, dan tidak memiliki formulir. Font, gambar, video, dan data peta untuk globe semuanya disajikan dari situs ini sendiri, jadi mengunjunginya tidak membawamu ke pihak lain mana pun.',
           'Seperti situs web lainnya, host yang menyajikan halaman-halaman ini dapat menyimpan log teknis standar, seperti alamat IP dan versi browser, untuk menjaga situs tetap berjalan dan aman.',
           'Tautan ke X, Instagram, YouTube, GitHub, Solscan, atau Arweave membawamu ke layanan tersebut, dan kebijakan mereka sendiri berlaku di sana.',
+          'Jika kamu memilih bahasa, atau menolak tawaran untuk membaca dalam bahasa lain, browser-mu menyimpan pilihan itu di perangkatmu, di penyimpanan lokal, bukan di cookie. Pilihan itu tidak pernah dikirim ke siapa pun.',
         ],
       },
       {

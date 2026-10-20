@@ -254,7 +254,7 @@ const es: Dict = {
       'Blockchain Manager': 'Responsable de blockchain',
       'Bitcoin Evangelist': 'Evangelista de Bitcoin',
       'NFT Artist': 'Artista NFT',
-      'NFT Promoter': 'Promotora de NFT',
+      'NFT Promoter': 'Promoción de NFT',
       'Electronic Engineer': 'Ingeniero electrónico',
       'AI Expert': 'Experto en IA',
       'Private Banker': 'Banquero privado',
@@ -382,6 +382,7 @@ const es: Dict = {
           'Este sitio no instala cookies, no usa herramientas de analítica, anuncios ni rastreadores, y no tiene formularios. Las fuentes, las imágenes, los videos y los datos del mapa del globo se sirven desde este mismo sitio, así que visitarlo no te conecta con nadie más.',
           'Como cualquier sitio web, el proveedor de alojamiento que sirve estas páginas puede conservar registros técnicos estándar, como una dirección IP y una versión del navegador, para mantener el sitio en funcionamiento y seguro.',
           'Los enlaces a X, Instagram, YouTube, GitHub, Solscan o Arweave te llevan a esos servicios, y allí se aplican sus propias políticas.',
+          'Si eliges un idioma, o rechazas la propuesta de leer en otro, tu navegador guarda esa elección en tu dispositivo, en su almacenamiento local, no en una cookie. Nunca se envía a nadie.',
         ],
       },
       {

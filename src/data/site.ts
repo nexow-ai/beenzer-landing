@@ -5,7 +5,7 @@
 export const SITE = {
   name: 'Beenzer',
   url: 'https://beenzer.app',
-  tagline: 'Been there. Done that.',
+  tagline: 'Beenzer. Done that.',
   description:
     'Beenzer pins your photos and videos to the exact place you took them. Follow friends, find them on the map, and keep any moment as a Solana NFT, with its place and time written in.',
   /** Bump with each release of the site. */

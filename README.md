@@ -3,7 +3,7 @@
 
 # Beenzer
 
-**Been there. Done that.**
+**Beenzer. Done that.**
 
 The website of Beenzer, the geo-social app by [Nexow, Inc.](https://nexow.studio): photos and videos pinned to the place they were taken, any of which can become a Solana NFT.
 
@@ -15,13 +15,13 @@ The website of Beenzer, the geo-social app by [Nexow, Inc.](https://nexow.studio
 
 ## What is on the site
 
-| Page                | What it does                                                                                                                                                       |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/`                 | The scroll dive: a dot-matrix Earth the camera falls onto, down to the shore of Lake Geneva where BEENZER #18 was minted. Then how the app works, on-chain, story, crew, journal, FAQ. |
-| `/journal/`         | News and guides, written in Markdown in `src/content/journal/`.                                                                                                    |
-| `/legal/`           | Site notice: who runs the site, and what it does with data (nothing: no cookies, analytics or trackers).                                                          |
-| `/dao/`             | Where the old DAO page sends people now.                                                                                                                           |
-| `/404`              | Nothing pinned here.                                                                                                                                               |
+| Page        | What it does                                                                                                                                                                           |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`         | The scroll dive: a dot-matrix Earth the camera falls onto, down to the shore of Lake Geneva where BEENZER #18 was minted. Then how the app works, on-chain, story, crew, journal, FAQ. |
+| `/journal/` | News and guides, written in Markdown in `src/content/journal/`.                                                                                                                        |
+| `/legal/`   | Site notice: who runs the site, and what it does with data (nothing: no cookies, analytics or trackers).                                                                               |
+| `/dao/`     | Where the old DAO page sends people now.                                                                                                                                               |
+| `/404`      | Nothing pinned here.                                                                                                                                                                   |
 
 ### The hero
 

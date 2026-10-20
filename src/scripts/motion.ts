@@ -33,6 +33,16 @@ export function scrollToTarget(target: HTMLElement | number) {
 
 function smoothScroll() {
   lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, allowNestedScroll: true });
+  // Lenis rewrites <html>'s classes each time scrolling starts or stops
+  // (lenis-scrolling, lenis-smooth), and every rewrite restyles the whole
+  // page mid-scroll. The site only needs "lenis" and "lenis-stopped".
+  const root = document.documentElement;
+  const instance = lenis;
+  instance.updateClassName = () => {
+    root.classList.add('lenis');
+    root.classList.toggle('lenis-stopped', instance.isStopped);
+  };
+  instance.updateClassName();
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis?.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -93,8 +103,18 @@ function reveals() {
   });
 }
 
+/** Blocks with looping animations pause them while off-screen: [data-anim] in global.css. */
+function pauseOffscreen() {
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.target.setAttribute('data-anim', e.isIntersecting ? 'on' : 'off')),
+    { rootMargin: '120px 0px' },
+  );
+  document.querySelectorAll('[data-anim]').forEach((el) => io.observe(el));
+}
+
 export function startMotion() {
   sectionLinks();
+  pauseOffscreen();
   if (reducedMotion()) return;
   document.documentElement.classList.add('motion');
   smoothScroll();

@@ -8,8 +8,32 @@ const date = new Date(`${FEATURED.date}T${FEATURED.timeUtc}Z`);
 const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 ---
 
+<!--
+  Before the hero is parsed: is there a real GPU? A software rasteriser
+  (SwiftShader, llvmpipe) takes hundreds of milliseconds a frame, so there,
+  as without WebGL or JavaScript, the globe is a poster, fetched at once.
+  Sets <html data-gpu="hardware|software|none">.
+-->
+<script is:inline>
+  (function () {
+    var kind = 'none';
+    try {
+      var canvas = document.createElement('canvas');
+      var gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+      if (gl) {
+        var debug = gl.getExtension('WEBGL_debug_renderer_info');
+        var name = String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+        kind = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(name) ? 'software' : 'hardware';
+        var lose = gl.getExtension('WEBGL_lose_context');
+        if (lose) lose.loseContext();
+      }
+    } catch (e) {}
+    document.documentElement.setAttribute('data-gpu', kind);
+  })();
+</script>
+
 <section class="hero" id="top" aria-label="Beenzer" data-hero>
-  <div class="stage" data-stage>
+  <div class="stage" data-stage data-anim>
     <canvas class="globe" data-globe aria-hidden="true"></canvas>
     <div class="poster" aria-hidden="true"></div>
     <div class="shade" aria-hidden="true"></div>
@@ -25,7 +49,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
       </h1>
       <p class="lead">
         Beenzer pins your photos and videos to the exact place you took them. Follow friends, find them on the map,
-        and turn any moment into a Solana NFT, only if you want to.
+        and keep any moment as a Solana NFT, with the place and the time written into it.
       </p>
       <div class="actions">
         <a class="btn" href="#how">See how it works <Icon name="arrow-down" /></a>
@@ -111,9 +135,9 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
     inset: 0;
     background: 72% 50% / cover no-repeat;
     opacity: 0;
-    transition: opacity 1s;
   }
   /* Only fetched when it is needed. */
+  :global(html:not([data-gpu='hardware'])) .poster,
   .no-webgl .poster {
     background-image: url('/globe/poster.webp');
     opacity: 1;
@@ -406,9 +430,11 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
       display: none;
     }
   }
-  .hero:has(.no-webgl) {
+  :global(html:not([data-gpu='hardware'])) .hero,
+  .hero.no-webgl {
     height: auto;
   }
+  :global(html:not([data-gpu='hardware'])) :is(.beat, .arrival, .leader, .cue, .hud),
   .no-webgl :is(.beat, .arrival, .leader, .cue, .hud) {
     display: none;
   }
@@ -456,12 +482,18 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
   const section = document.querySelector<HTMLElement>('[data-hero]');
   const stage = section?.querySelector<HTMLElement>('[data-stage]');
 
+  // Only a real GPU gets the globe (see the inline probe above).
+  const hardware = document.documentElement.dataset.gpu === 'hardware';
+
   // Three.js loads after the headline has painted, when the browser is idle.
   const start = () => {
-    if (!section || !stage) return;
-    import('../scripts/globe').then(({ mountGlobe }) => mountGlobe(stage, section)).catch(() => {
-      stage.classList.add('no-webgl');
-    });
+    if (!section || !stage || !hardware) return;
+    import('../scripts/globe')
+      .then(({ mountGlobe }) => mountGlobe(stage, section))
+      .catch(() => {
+        stage.classList.add('no-webgl');
+        section.classList.add('no-webgl');
+      });
   };
   if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1200 });
   else setTimeout(start, 200);

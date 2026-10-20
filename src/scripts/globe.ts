@@ -7,11 +7,13 @@
  * planet is dots, the pins are light, and the only solid object is the logo's
  * pin waiting at the end.
  *
- * Budget: three draw calls for the land (≈50k points, one per detail level),
- * one each for pins, stems, body, halo, the 3D pin and its ground rings.
- * Device pixel ratio capped at 2. The land mask is 6 KB gzipped and loads
- * after the headline has painted. The loop stops when the hero is off-screen
- * or the tab is hidden, and with prefers-reduced-motion it draws one frame.
+ * Budget: about 85k land dots in five levels of detail, one draw call per
+ * level and only for the levels on screen; one call each for pins, stems,
+ * body, halo, the 3D pin and its ground rings. Device pixel ratio capped at 2,
+ * stepped down while frames run long. The land mask is 8 KB gzipped. Three.js
+ * loads after the headline has painted, and only on a hardware GPU (the
+ * probe in Hero.astro). The loop stops when the hero is off-screen or the tab is
+ * hidden, and with prefers-reduced-motion it draws one frame.
  */
 import {
   AdditiveBlending,
@@ -387,6 +389,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
   const canvas = stage.querySelector<HTMLCanvasElement>('[data-globe]');
   if (!canvas || !webglAvailable()) {
     stage.classList.add('no-webgl');
+    section.classList.add('no-webgl');
     return null;
   }
 
@@ -394,6 +397,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
   const res = await fetch('/globe/land.bin');
   if (!res.ok) {
     stage.classList.add('no-webgl');
+    section.classList.add('no-webgl');
     return null;
   }
   const bits = new Uint8Array(await res.arrayBuffer());
@@ -403,19 +407,13 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   } catch {
     stage.classList.add('no-webgl');
+    section.classList.add('no-webgl');
     return null;
   }
   renderer.setClearColor(0x000000, 0);
 
-  // A software rasteriser (SwiftShader, llvmpipe) draws a frame in hundreds of
-  // milliseconds: there, the globe only redraws when something moves.
-  const gl = renderer.getContext();
-  const debug = gl.getExtension('WEBGL_debug_renderer_info');
-  const gpu = String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
-  const software = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(gpu);
-
   // Resolution scale: lowered while frames run long, raised again when they recover.
-  let quality = software ? 0.5 : 1;
+  let quality = 1;
   const dpr = () => Math.min(window.devicePixelRatio || 1, 2) * quality;
   renderer.setPixelRatio(dpr());
 
@@ -602,10 +600,18 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
   const leaderLine = leader?.querySelector('line');
   const leaderDot = leader?.querySelector('circle');
   const anchor = { x: 0, y: 0 };
-  const hud = {
-    lat: stage.querySelector<HTMLElement>('[data-hud-lat]'),
-    lon: stage.querySelector<HTMLElement>('[data-hud-lon]'),
-    alt: stage.querySelector<HTMLElement>('[data-hud-alt]'),
+  // The read-out changes every frame of the dive: write into its text nodes
+  // in place, so no node is added to or removed from the page.
+  const textNode = (sel: string) => {
+    const el = stage.querySelector<HTMLElement>(sel);
+    if (!el) return null;
+    const node = document.createTextNode(el.textContent ?? '');
+    el.replaceChildren(node);
+    return node;
+  };
+  const hud = { lat: textNode('[data-hud-lat]'), lon: textNode('[data-hud-lon]'), alt: textNode('[data-hud-alt]') };
+  const setText = (node: Text | null, value: string) => {
+    if (node && node.data !== value) node.data = value;
   };
 
   // ---------- state ----------
@@ -802,28 +808,16 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     lon = ((((lon + 180) % 360) + 360) % 360) - 180;
     const lat = cur.rx / RAD;
     const km = Math.round(cur.alt * EARTH_KM);
-    if (hud.lat) hud.lat.textContent = `${Math.abs(lat).toFixed(2)}° ${lat >= 0 ? 'N' : 'S'}`;
-    if (hud.lon) hud.lon.textContent = `${Math.abs(lon).toFixed(2)}° ${lon >= 0 ? 'E' : 'W'}`;
-    if (hud.alt) hud.alt.textContent = km.toLocaleString('en-US');
+    setText(hud.lat, `${Math.abs(lat).toFixed(2)}° ${lat >= 0 ? 'N' : 'S'}`);
+    setText(hud.lon, `${Math.abs(lon).toFixed(2)}° ${lon >= 0 ? 'E' : 'W'}`);
+    setText(hud.alt, km.toLocaleString('en-US'));
   }
-
-  let lastP = -1;
-  let pointerMoved = false;
 
   function frame(dt: number) {
     const p = reduced ? 0 : progress();
-    // On a software renderer, hold still unless the page moves: no idle spin,
-    // no pulse, and no draw once the camera has settled.
-    if (software && started) {
-      const scrolled = Math.abs(p - lastP) > 1e-5;
-      const settling = Math.abs(cur.alt / goal(p).alt - 1) > 0.002;
-      if (!scrolled && !settling && !pointerMoved) return;
-    }
-    lastP = p;
-    pointerMoved = false;
-    if (!software) time += dt;
+    time += dt;
     // The idle spin slows to a stop as the dive begins.
-    if (!reduced && !software) spin += dt * 0.045 * (1 - smooth(0, 0.08, p));
+    if (!reduced) spin += dt * 0.045 * (1 - smooth(0, 0.08, p));
     // Keep the spin within half a turn of the target, so the dive always takes
     // the short way round. Shifting both by a full turn changes nothing on screen.
     if (spin > ryTarget + Math.PI) {
@@ -854,7 +848,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     frame(dt);
     // Adaptive resolution: a second of long frames steps the pixel ratio
     // down, five seconds of smooth ones step it back up.
-    if (software || dt > 0.25) return;
+    if (dt > 0.25) return;
     slow = dt > 0.034 ? slow + dt : 0;
     fast = dt < 0.02 ? fast + dt : 0;
     if (slow > 1 && quality > 0.5) {
@@ -885,7 +879,6 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     if (e.pointerType !== 'mouse') return;
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
     pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
-    pointerMoved = !software;
   };
   window.addEventListener('resize', onResize);
   // Fonts and images above the fold can change the page's height after load.

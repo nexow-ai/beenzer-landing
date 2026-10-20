@@ -13,7 +13,7 @@ const pins = Array.from({ length: 26 }, (_, i) => ({
 }));
 ---
 
-<section class="follow" id="follow" aria-labelledby="follow-title">
+<section class="follow" id="follow" aria-labelledby="follow-title" data-anim>
   <div class="field" aria-hidden="true">
     {pins.map((p) => <i style={`left:${p.x}%;top:${p.y}%;--d:${p.d}s;--s:${p.s}`} />)}
   </div>

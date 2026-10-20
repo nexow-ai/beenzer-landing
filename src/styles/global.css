@@ -426,3 +426,10 @@ html.motion [data-reveal='fade'] {
 html.motion [data-split] {
   visibility: hidden;
 }
+
+/* Looping animations stop while their block is off-screen (src/scripts/motion.ts). */
+[data-anim='off'] *,
+[data-anim='off'] *::before,
+[data-anim='off'] *::after {
+  animation-play-state: paused !important;
+}

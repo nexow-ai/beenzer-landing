@@ -279,6 +279,9 @@ const path = Astro.url.pathname;
     menu.hidden = !open;
     header.toggleAttribute('data-open', open);
     document.documentElement.classList.toggle('menu-open', open);
+    // Keep focus inside the menu while it covers the page.
+    document.querySelectorAll('#main, .site-footer, .skip-link').forEach((el) => el.toggleAttribute('inert', open));
+    if (open) menu.querySelector<HTMLAnchorElement>('[data-menu-link]')?.focus();
     window.dispatchEvent(new CustomEvent(open ? 'scroll-lock' : 'scroll-unlock'));
   }
 

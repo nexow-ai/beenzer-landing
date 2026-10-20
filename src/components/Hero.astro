@@ -143,6 +143,8 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
   .headline {
     display: grid;
     margin-left: -0.04em;
+    /* Bounded by the height too, for landscape phones and short windows. */
+    font-size: clamp(2.4rem, min(7.4vw, 13.5vh), 8.25rem);
   }
   .line {
     display: block;
@@ -407,8 +409,46 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
   .hero:has(.no-webgl) {
     height: auto;
   }
-  .no-webgl :is(.beat, .arrival, .leader, .cue) {
+  .no-webgl :is(.beat, .arrival, .leader, .cue, .hud) {
     display: none;
+  }
+
+  @media (max-height: 560px) and (orientation: landscape) {
+    .intro {
+      gap: 14px;
+      padding-bottom: 28px;
+    }
+    .status,
+    .cue {
+      display: none;
+    }
+    .intro .lead {
+      font-size: 0.95rem;
+      max-width: 46ch;
+    }
+    .actions .btn {
+      min-height: 44px;
+    }
+    .arrival {
+      top: calc(var(--header-h) + 8px);
+      translate: 0 0;
+      padding: 16px;
+    }
+    .arrival-body :global(.arrival-photo) {
+      height: 96px;
+    }
+    .arrival-title {
+      margin: 4px 0 10px;
+    }
+    .arrival-meta {
+      gap: 4px;
+    }
+    .arrival-meta div {
+      padding-bottom: 4px;
+    }
+    .arrival-link {
+      margin-top: 8px;
+    }
   }
 </style>
 

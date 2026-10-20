@@ -1,9 +1,37 @@
 # Changelog
 
-All notable changes to the Beenzer Landing Page project will be documented in this file.
+All notable changes to the Beenzer website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.0.0] - 2026-10-20
+
+A rebuild from scratch, for Beenzer as a product of Nexow, Inc. (nexow.studio).
+
+### Added
+
+- Astro 7 static site with self-hosted fonts and no cookies, analytics or trackers
+- Scroll-driven WebGL hero: a dot-matrix globe the camera falls onto, in five levels of detail, landing on the shore of Lake Geneva where BEENZER #18 was minted, with the logo's pin in 3D
+- "How it works" tour: a phone built in HTML that runs the Flutter rebuild's screens (map, camera, pin with a live visibility slider, feed, mint)
+- BEENZER #18 as a holographic card, with its real on-chain data
+- On-chain section, read from the minting server: Phantom sign-in, Arweave, Metaplex editions, royalties, and the mint pipeline
+- Story timeline and the original app's walkthrough, cropped to its screen
+- Journal with three articles, a site notice, a DAO page, and a 404
+- SEO: canonical URLs, Open Graph image rendered from the hero, JSON-LD (organization, app, FAQ, articles), sitemap, robots, web manifest and icons
+- Redirects from the original site's addresses, and a Cloudflare Workers config
+
+### Changed
+
+- Ownership: Nexow, Inc. in the footer, the license and the metadata
+- Copy now follows the facts: the app is being rebuilt in Flutter for iOS and Android, and NFTs are optional
+- The featured NFT is BEENZER #18 in Savigny, as on-chain, instead of "#33" in Barcelona
+
+### Removed
+
+- The jQuery and Bootstrap template, its demo pages in `html/`, and about 670 MB of unused stock video
+- Unverified numbers, placeholder sellers and auctions, the defunct Google Play link and the expired Discord and Telegram invites
+- The $BEEN and $BEENZ "invest and earn dividends" copy
 
 ## [1.0.5] - 2025-11-05
 

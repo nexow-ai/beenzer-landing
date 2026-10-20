@@ -1,203 +1,57 @@
-# Contributing to Beenzer Landing
+# Contributing to the Beenzer website
 
-First off, thank you for considering contributing to Beenzer Landing! 🎉
+Thanks for helping. This repository is the website of Beenzer, a product of [Nexow, Inc.](https://nexow.studio). Bug reports, fixes and improvements are all welcome.
 
-It's people like you that make Beenzer such a great project. We welcome contributions from everyone, whether it's:
+## Set up
 
-- 🐛 Reporting a bug
-- 💡 Discussing the current state of the code
-- 🔧 Submitting a fix
-- ✨ Proposing new features
-- 📖 Improving documentation
+Requires Node 22 (`.nvmrc`).
 
-## Development Process
-
-We use GitHub to host code, track issues and feature requests, as well as accept pull requests.
-
-## Pull Requests Process
-
-We actively welcome your pull requests! Here's how to contribute:
-
-1. **Fork the repository** and create your branch from `main`
-
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/beenzer-landing.git
-   cd beenzer-landing
-   git checkout -b feature/amazing-feature
-   ```
-
-2. **Make your changes**
-
-   - Follow the existing code style
-   - Test your changes across different browsers
-   - Ensure responsive design works on mobile, tablet, and desktop
-   - Add comments where necessary
-
-3. **Commit your changes** using descriptive commit messages with emojis
-
-   ```bash
-   git commit -m "✨ Add amazing new feature"
-   ```
-
-   Common emoji prefixes:
-
-   - ✨ `:sparkles:` - New feature
-   - 🐛 `:bug:` - Bug fix
-   - 📝 `:memo:` - Documentation
-   - 🎨 `:art:` - UI/styling improvements
-   - ♻️ `:recycle:` - Code refactoring
-   - ⚡ `:zap:` - Performance improvements
-   - 🔒 `:lock:` - Security fixes
-   - 🚀 `:rocket:` - Deployment related
-
-4. **Push to your fork**
-
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-
-5. **Open a Pull Request**
-   - Provide a clear title and description
-   - Reference any related issues
-   - Include screenshots for UI changes
-   - List any breaking changes
-
-## Code Style Guidelines
-
-### HTML
-
-- Use semantic HTML5 elements
-- Maintain proper indentation (tabs or spaces - be consistent)
-- Add meaningful `alt` attributes to images
-- Use descriptive class names
-- Keep accessibility in mind (ARIA labels, semantic structure)
-
-### CSS
-
-- Follow existing naming conventions
-- Use the project's color variables where applicable
-- Comment complex selectors
-- Organize styles logically (by component or section)
-- Test across browsers (Chrome, Firefox, Safari, Edge)
-
-### JavaScript
-
-- Use ES6+ syntax where appropriate
-- Add comments for complex logic
-- Keep functions small and focused
-- Test functionality across different devices
-
-### Responsive Design
-
-- Test on multiple screen sizes:
-  - Mobile: 320px - 767px
-  - Tablet: 768px - 1024px
-  - Desktop: 1025px+
-- Use Bootstrap's responsive utilities
-- Ensure touch targets are appropriately sized for mobile
-
-## Testing Checklist
-
-Before submitting your PR, please verify:
-
-- [ ] Code works in Chrome, Firefox, Safari, and Edge
-- [ ] Responsive design functions on mobile, tablet, and desktop
-- [ ] Dark/light mode switching works correctly
-- [ ] All links are functional
-- [ ] Images load properly
-- [ ] No console errors
-- [ ] Forms validate correctly (if applicable)
-- [ ] Animations and transitions work smoothly
-- [ ] Page loads within acceptable time
-
-## Bug Reports
-
-Great bug reports tend to have:
-
-- A quick summary and/or background
-- Steps to reproduce
-  - Be specific!
-  - Provide sample code if applicable
-- What you expected would happen
-- What actually happens
-- Notes (possibly including why you think this might be happening)
-- Screenshots or videos demonstrating the issue
-- Browser and device information
-
-**Use the GitHub issue tracker** to report bugs.
-
-## Feature Requests
-
-We love feature requests! When submitting a feature request:
-
-1. **Check existing issues** to avoid duplicates
-2. **Provide clear use cases** - explain why this feature would be useful
-3. **Be specific** about the desired behavior
-4. **Consider the scope** - is this aligned with project goals?
-5. **Add mockups or examples** if relevant
-
-## Documentation
-
-Documentation improvements are always welcome:
-
-- Fix typos or unclear explanations
-- Add examples or use cases
-- Improve existing documentation structure
-- Translate documentation (if multilingual support is planned)
-
-## Community Guidelines
-
-### Code of Conduct
-
-- **Be respectful** - treat everyone with respect and kindness
-- **Be patient** - remember that contributors have different experience levels
-- **Be constructive** - provide helpful feedback
-- **Be collaborative** - work together towards common goals
-- **Be inclusive** - welcome diverse perspectives
-
-### Getting Help
-
-- **Discord**: [Join our community](https://discord.gg/Ta9X6zbg)
-- **X (Twitter)**: [@beenzer_app](https://x.com/beenzer_app)
-- **Instagram**: [@beenzer_app](https://instagram.com/beenzer_app)
-- **Issues**: Use GitHub issues for bug reports and feature requests
-- **Email**: contact@beenzer.app for other inquiries
-
-## Project Structure Overview
-
-```
-beenzer-landing/
-├── index.html          # Main landing page
-├── dao.html           # DAO information page
-├── css/               # Stylesheets
-├── js/                # JavaScript files
-├── images/            # Image assets
-├── fonts/             # Font files
-└── videos/            # Video assets
+```bash
+git clone git@github.com:nexow-ai/beenzer-landing.git
+cd beenzer-landing
+git checkout dev
+npm ci
+npm run dev
 ```
 
-See the [README](README.md) for detailed project structure.
+## Pull requests
 
-## License
+1. Branch from `dev` (`feature/…`, `fix/…`). `main` is what ships.
+2. Make the change, then run `npm run check` and `npm run build`. Both must pass.
+3. Commit with a short message and the repository's emoji prefix:
 
-By contributing, you agree that your contributions will be licensed under the MIT License. See [LICENSE](LICENSE) for details.
+   - ✨ new feature
+   - 🐛 bug fix
+   - 📝 content or documentation
+   - 🎨 styling
+   - ♻️ refactor
+   - ⚡ performance
+   - ♿ accessibility
+   - 🔍 SEO
 
-## Questions?
+4. Open the pull request against `dev`, with a clear description and, for visual changes, screenshots on a phone and a desktop.
 
-Don't hesitate to reach out if you have any questions! We're here to help:
+## House rules
 
-- Open an issue with the `question` label
-- Join our [Discord community](https://discord.gg/Ta9X6zbg)
-- Email us at contact@beenzer.app
+- **Facts only.** Every claim on the site has a source, noted next to it in `src/data/`. No invented numbers, users, quotes, dates or prices. If a fact is unknown, leave it out.
+- **Dependencies are pinned exactly** (`.npmrc`). Update them in a commit of their own, with the lockfile.
+- **One dark theme.** Colours, type and spacing come from the tokens in `src/styles/global.css`. Do not hard-code new colours in components.
+- **Motion with manners.** Every animation must respect `prefers-reduced-motion`, and nothing may trap or hijack the scroll.
+- **Accessible by default.** Real text for content, labels on icon-only controls, visible focus, touch targets of at least 44 px, and alt text that says what a photo shows.
+- **Light pages.** Images go in `src/assets/` so the build resizes them; videos are re-encoded before they go in `public/media/`. The globe's budget is written at the top of `src/scripts/globe.ts`.
 
----
+## Before you open a pull request
 
-## Recognition
+- [ ] `npm run check` and `npm run build` pass
+- [ ] Looks right at 390 px, 768 px and 1440 px wide
+- [ ] Works with `prefers-reduced-motion: reduce`
+- [ ] No console errors, no broken links
+- [ ] Keyboard: every link and control can be reached and seen
 
-All contributors will be recognized in our documentation and community channels. We appreciate every contribution, no matter how small!
+## Reporting a bug
 
-Thank you for helping make Beenzer better! 💚
+Open an issue with what you did, what you expected, what happened, and your browser and device. Screenshots help.
 
----
+## Contact
 
-**Happy Contributing! 🚀**
+[@beenzer_app](https://x.com/beenzer_app) on X and [Instagram](https://www.instagram.com/beenzer_app/), or [Nexow's contact page](https://nexow.studio/contact).

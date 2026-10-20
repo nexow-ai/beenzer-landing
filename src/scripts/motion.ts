@@ -112,9 +112,28 @@ function pauseOffscreen() {
   document.querySelectorAll('[data-anim]').forEach((el) => io.observe(el));
 }
 
+/**
+ * Browsers fetch a video's poster as soon as they parse it. These sit far
+ * down the page: give each its poster when it comes within a screen or two.
+ */
+function lazyPosters() {
+  const io = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const video = e.target as HTMLVideoElement;
+        video.poster = video.dataset.poster ?? '';
+        io.unobserve(video);
+      }),
+    { rootMargin: '150% 0px' },
+  );
+  document.querySelectorAll('video[data-poster]').forEach((v) => io.observe(v));
+}
+
 export function startMotion() {
   sectionLinks();
   pauseOffscreen();
+  lazyPosters();
   if (reducedMotion()) return;
   document.documentElement.classList.add('motion');
   smoothScroll();

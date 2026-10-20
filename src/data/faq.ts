@@ -16,8 +16,8 @@ export const faq = [
     a: 'Yes: Phantom is how you sign in. You connect it and sign a one-time message to prove the wallet is yours, so there is no email and no password. Beenzer never sees your keys.',
   },
   {
-    q: 'Do I have to mint my posts?',
-    a: 'No. Minting is for the posts you want to keep as a token, or let others collect. It costs a mint fee in SOL, and the app shows the fee and where it goes before you approve anything in Phantom.',
+    q: 'What does minting cost?',
+    a: 'A mint fee in SOL. The app shows the fee, and the wallet it goes to, before you approve anything in Phantom, and nothing is sent without your signature.',
   },
   {
     q: 'Who can see what I post?',
@@ -37,7 +37,7 @@ export const faq = [
   },
   {
     q: 'What happened to the Beenzer DAO and its tokens?',
-    a: 'They were part of the original 2022 design. The new app is built around posts, the map and optional NFTs; nothing on this site is an offer of any token.',
+    a: 'They were part of the original 2022 design. The new app is built around posts and the map, and nothing on this site is an offer of any token.',
   },
   {
     q: 'Who is behind Beenzer?',

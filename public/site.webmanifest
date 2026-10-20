@@ -1,7 +1,7 @@
 {
   "name": "Beenzer",
   "short_name": "Beenzer",
-  "description": "Photos and videos pinned to the place they were taken, with optional Solana NFTs.",
+  "description": "Photos and videos pinned to the place they were taken, each of which can become a Solana NFT.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050506",

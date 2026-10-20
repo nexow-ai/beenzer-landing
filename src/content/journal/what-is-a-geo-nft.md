@@ -59,6 +59,6 @@ The visibility radius is not decoration. When you open the map, Beenzer shows yo
 
 So a geo-NFT is two things at once: a record of a place, and a way to leave something in a place for the people who pass by.
 
-## Do I have to mint?
+## What minting costs
 
-No. Minting is what turns a post into a token you hold in your wallet, with editions others can collect. It costs a mint fee in SOL, and the app shows it, and where it goes, before you approve anything in Phantom.
+Minting turns a post into a token you hold in your wallet, with editions others can collect. It costs a mint fee in SOL, and the app shows it, and where it goes, before you approve anything in Phantom.

@@ -24,7 +24,7 @@ A rebuild from scratch, for Beenzer as a product of Nexow, Inc. (nexow.studio).
 ### Changed
 
 - Ownership: Nexow, Inc. in the footer, the license and the metadata
-- Copy now follows the facts: the app is being rebuilt in Flutter for iOS and Android, and NFTs are optional
+- Copy now follows the facts: the app is being rebuilt in Flutter for iOS and Android, and any post can become a Solana NFT
 - The featured NFT is BEENZER #18 in Savigny, as on-chain, instead of "#33" in Barcelona
 
 ### Removed

@@ -26,6 +26,6 @@ A token is only as good as what it points to. Beenzer uploads the media, and the
 
 Phantom is the wallet you sign in with. On a phone, Beenzer talks to it through deep links: it asks Phantom to connect, asks you to sign a one-time message to prove the wallet is yours, and later asks you to approve the mint fee. Nothing is sent without your signature, and the app never holds your keys.
 
-## And if crypto is not your thing
+## The point is still the map
 
-Then the map, the feed, your friends and your chats are still the point. Minting is there for the posts you want to keep, collect or sell, and the app shows the fee before you approve anything.
+The chain is how a moment is kept and owned. The map, the feed, your friends and your chats are what Beenzer is for. Before any mint, the app shows the fee and where it goes, and nothing happens until you approve it in Phantom.

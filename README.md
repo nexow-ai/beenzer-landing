@@ -5,7 +5,7 @@
 
 **Been there. Done that.**
 
-The website of Beenzer, the geo-social app by [Nexow, Inc.](https://nexow.studio): photos and videos pinned to the place they were taken, with optional Solana NFTs.
+The website of Beenzer, the geo-social app by [Nexow, Inc.](https://nexow.studio): photos and videos pinned to the place they were taken, any of which can become a Solana NFT.
 
 [beenzer.app](https://beenzer.app) · [Beenzer at Nexow](https://nexow.studio/products/beenzer) · [@beenzer_app](https://x.com/beenzer_app)
 

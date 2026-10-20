@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://beenzer.app/sitemap-index.xml

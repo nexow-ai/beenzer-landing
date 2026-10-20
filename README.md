@@ -7,7 +7,7 @@
 
 The website of Beenzer, the geo-social app by [Nexow, Inc.](https://nexow.studio): photos and videos pinned to the place they were taken, any of which can become a Solana NFT.
 
-[beenzer.app](https://beenzer.app) · [Beenzer at Nexow](https://nexow.studio/products/beenzer) · [@beenzer_app](https://x.com/beenzer_app)
+[beenzer.xyz](https://beenzer.xyz) · [Beenzer at Nexow](https://nexow.studio/products/beenzer) · [@beenzer_app](https://x.com/beenzer_app)
 
 </div>
 
@@ -63,8 +63,9 @@ npm run globe     # Natural Earth land via world-atlas, lakes from scripts/data/
 
 The build is a static folder. Two ways:
 
-- **Cloudflare Workers**, like nexow.studio: `npm run deploy` (uses `wrangler.jsonc`; attach the domain in the dashboard first).
-- **Any static host**: publish `dist/`. `public/_redirects` sends the original site's addresses (`/dao.html`, `/doc.html`, `/html/*`) to their new homes on hosts that read it (Cloudflare, Netlify).
+- **Cloudflare Workers**, like nexow.studio: `npm run deploy` builds and publishes to [beenzer.xyz](https://beenzer.xyz), the Worker's custom domain (`wrangler.jsonc`; the zone is in Nexow's Cloudflare account). The Worker also answers on beenzer-landing.nexow.workers.dev, with canonical links pointing to beenzer.xyz.
+- **The site's address** (canonical links, Open Graph, sitemap, robots.txt) comes from `SITE_URL` at build time and defaults to `https://beenzer.xyz`.
+- **Any static host**: publish `dist/`. `public/_redirects` sends the original site's addresses (`/dao.html`, `/doc.html`, `/html/*`) to their new homes, and `public/_headers` sets caching and security headers, on hosts that read them (Cloudflare, Netlify).
 
 ## Structure
 

@@ -19,7 +19,7 @@ A rebuild from scratch, for Beenzer as a product of Nexow, Inc. (nexow.studio).
 - Story timeline and the original app's walkthrough, cropped to its screen
 - Journal with three articles, a site notice, a DAO page, and a 404
 - SEO: canonical URLs, Open Graph image rendered from the hero, JSON-LD (organization, app, FAQ, articles), sitemap, robots, web manifest and icons
-- Redirects from the original site's addresses, and a Cloudflare Workers config
+- Served at beenzer.xyz from a Cloudflare Worker, with caching and security headers and redirects from the original site's addresses
 
 ### Changed
 

@@ -24,9 +24,14 @@ function keepLatinFontRange() {
   };
 }
 
+// The site's own address, for canonical links, Open Graph, the sitemap and
+// robots.txt: beenzer.xyz, where the Worker serves it. Set SITE_URL to build
+// for another host.
+const site = process.env.SITE_URL || 'https://beenzer.xyz';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://beenzer.app',
+  site,
   trailingSlash: 'ignore',
   // Styles are small (about 8 kB gzipped): inline them and skip a render-blocking request.
   build: { format: 'directory', inlineStylesheets: 'always' },

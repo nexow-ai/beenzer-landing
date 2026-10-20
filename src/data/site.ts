@@ -4,7 +4,8 @@
  */
 export const SITE = {
   name: 'Beenzer',
-  url: 'https://beenzer.app',
+  /** Where this build is served: astro.config.mjs, from SITE_URL or beenzer.xyz. */
+  url: (import.meta.env.SITE ?? 'https://beenzer.xyz').replace(/\/$/, ''),
   tagline: 'Beenzer. Done that.',
   description:
     'Beenzer pins your photos and videos to the exact place you took them. Follow friends, find them on the map, and keep any moment as a Solana NFT, with its place and time written in.',

@@ -28,7 +28,8 @@ function keepLatinFontRange() {
 export default defineConfig({
   site: 'https://beenzer.app',
   trailingSlash: 'ignore',
-  build: { format: 'directory' },
+  // Styles are small (about 8 kB gzipped): inline them and skip a render-blocking request.
+  build: { format: 'directory', inlineStylesheets: 'always' },
   vite: {
     plugins: [keepLatinFontRange()],
     // three.js is one deferred chunk of about 570 kB (140 kB gzipped), loaded after first paint.

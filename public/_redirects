@@ -4,3 +4,6 @@
 /doc.html /journal/ 301
 /news-single.html /journal/ 301
 /html/* / 301
+# English lives at the root; /en/ is not a path of its own.
+/en / 301
+/en/* /:splat 301

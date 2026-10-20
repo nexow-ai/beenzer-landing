@@ -1,26 +1,22 @@
 ---
-import Base from '../layouts/Base.astro';
-import Icon from '../components/Icon.astro';
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { localeParams, useLocale, type Locale } from '../../i18n';
+
+export const getStaticPaths = localeParams;
+
+const { locale } = Astro.props as { locale: Locale };
+const { t, path } = useLocale(locale);
 ---
 
-<Base
-  title="Beenzer DAO"
-  description="The Beenzer DAO and its tokens were part of the original 2022 design. What Beenzer does on-chain today."
->
+<Base title={t.dao.title} description={t.dao.description}>
   <section class="page container">
-    <p class="eyebrow">The DAO</p>
-    <h1 class="display">The DAO was the first draft.</h1>
-    <p class="lead">
-      In 2022, Beenzer was designed around a DAO, with two tokens of its own. The new app is built around posts and
-      the map instead. Nothing on this site is an offer of any token.
-    </p>
-    <p class="lead">
-      What Beenzer does on-chain today: you sign in with Phantom, and any post can be minted as a Metaplex NFT on
-      Solana, kept on Arweave, with limited editions and royalties for its creator.
-    </p>
+    <p class="eyebrow">{t.dao.eyebrow}</p>
+    <h1 class="display">{t.dao.heading}</h1>
+    {t.dao.leads.map((lead) => <p class="lead">{lead}</p>)}
     <div class="actions">
-      <a class="btn" href="/#onchain">How Beenzer uses Solana <Icon name="arrow-right" /></a>
-      <a class="btn ghost" href="/#faq">FAQ</a>
+      <a class="btn" href={path('/#onchain')}>{t.dao.onchain} <Icon name="arrow-right" /></a>
+      <a class="btn ghost" href={path('/#faq')}>{t.dao.faq}</a>
     </div>
   </section>
 </Base>

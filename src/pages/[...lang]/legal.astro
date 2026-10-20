@@ -1,64 +1,38 @@
 ---
-import Base from '../layouts/Base.astro';
-import { SITE } from '../data/site';
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../data/site';
+import { fill, localeParams, rich, useLocale, type Locale } from '../../i18n';
 
-const updated = '2026-10-20';
-const incorporated = new Date(`${SITE.owner.incorporated}T00:00:00Z`).toLocaleDateString('en-GB', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'UTC',
-});
+export const getStaticPaths = localeParams;
+
+const { locale } = Astro.props as { locale: Locale };
+const { t, date } = useLocale(locale);
+const updated = '2026-10-21';
+const long = (iso: string) => date(new Date(`${iso}T00:00:00Z`), { day: 'numeric', month: 'long', year: 'numeric' });
+const values = { company: SITE.owner.name, incorporated: long(SITE.owner.incorporated) };
+const links = { legal: SITE.owner.legal, contact: SITE.owner.contact };
+const [before, after = ''] = t.legal.updated.split('{date}');
 ---
 
-<Base title="Site notice" description="Who runs this site, what it does with your data (nothing), and the small print.">
+<Base title={t.legal.title} description={t.legal.description}>
   <section class="page container">
     <header class="head">
-      <p class="eyebrow">Site notice</p>
-      <h1 class="display">The small print.</h1>
-      <p class="mono updated">Last updated <time datetime={updated}>{updated}</time></p>
+      <p class="eyebrow">{t.legal.eyebrow}</p>
+      <h1 class="display">{t.legal.heading}</h1>
+      <p class="mono updated">{before}<time datetime={updated}>{long(updated)}</time>{after}</p>
     </header>
 
     <div class="prose">
-      <h2>Who runs this site</h2>
-      <p>
-        This website is run by <strong>{SITE.owner.name}</strong>, a Delaware corporation incorporated on {incorporated}.
-        Beenzer is one of its products. The company's details and its own policies are on{' '}
-        <a href={SITE.owner.legal} target="_blank" rel="noopener">nexow.studio/legal</a>, and you can reach it through
-        the <a href={SITE.owner.contact} target="_blank" rel="noopener">contact page</a>.
-      </p>
-
-      <h2>Your data on this site</h2>
-      <p>
-        This site sets no cookies, runs no analytics, ads or trackers, and has no forms. Fonts, images, videos and the
-        globe's map data are all served from this site itself, so visiting it does not send you to anyone else.
-      </p>
-      <p>
-        Like any website, the host that serves these pages may keep standard technical logs, such as an IP address and a
-        browser version, to keep the site running and safe.
-      </p>
-      <p>
-        Links to X, Instagram, YouTube, GitHub, Solscan or Arweave take you to those services, and their own policies
-        apply there.
-      </p>
-
-      <h2>The app</h2>
-      <p>
-        This notice covers this website only. The Beenzer app will ship with its own terms of use and privacy policy.
-      </p>
-
-      <h2>Not an offer</h2>
-      <p>
-        Nothing on this site is an offer to buy or sell any token, NFT or security, or financial advice. Blockchain
-        transactions cannot be undone, and the value of digital assets can go down as well as up.
-      </p>
-
-      <h2>Names and marks</h2>
-      <p>
-        The Beenzer name and logo belong to {SITE.owner.name} Solana, Metaplex, Arweave, Phantom, Flutter, Google Maps,
-        Node.js, Apple, Android, X, Instagram, YouTube and GitHub are the names of their respective owners, used here only
-        to say what Beenzer works with.
-      </p>
+      {
+        t.legal.sections.map((section) => (
+          <>
+            <h2>{section.title}</h2>
+            {section.body.map((p) => (
+              <p set:html={rich(fill(p, values), links, { linkClass: '' })} />
+            ))}
+          </>
+        ))
+      }
     </div>
   </section>
 </Base>
@@ -97,10 +71,10 @@ const incorporated = new Date(`${SITE.owner.incorporated}T00:00:00Z`).toLocaleDa
     letter-spacing: -0.03em;
     color: var(--text);
   }
-  .prose strong {
+  .prose :global(strong) {
     color: var(--text);
   }
-  .prose a {
+  .prose :global(a) {
     color: var(--neon);
     text-decoration: underline;
     text-underline-offset: 3px;

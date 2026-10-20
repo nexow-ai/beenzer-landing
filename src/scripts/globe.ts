@@ -135,6 +135,11 @@ const landVertex = /* glsl */ `
     vShade = 0.7 + 0.3 * sin(aSeed * 91.0 + uTime * (0.6 + aSeed));
     vAlpha = alpha;
     gl_Position = projectionMatrix * mv;
+    // A dot nobody can see never reaches the rasteriser.
+    if (alpha < 0.004) {
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      gl_PointSize = 0.0;
+    }
   }
 `;
 
@@ -301,31 +306,44 @@ const ringFragment = /* glsl */ `
 
 // ---------- geometry ----------
 
-function landGeometry(bits: Uint8Array) {
+/**
+ * One geometry per level of detail, the world lattice first and the finest
+ * cap last, each built only when it is asked for.
+ */
+function landLevels(bits: Uint8Array): (() => BufferGeometry)[] {
   const on = (k: number) => (bits[k >> 3] & (1 << (k & 7))) !== 0;
-  const positions: number[] = [];
-  const levels: number[] = [];
-  const seeds: number[] = [];
   const v = new Vector3();
-  const push = (lat: number, lon: number, level: number) => {
-    toVec(lat, lon, v);
-    positions.push(v.x, v.y, v.z);
-    levels.push(level);
-    // Deterministic per point, so the shimmer pattern is stable between visits.
-    seeds.push((Math.sin(positions.length * 12.9898) * 43758.5453) % 1);
+  const build = (points: [number, number][], level: number) => {
+    const positions = new Float32Array(points.length * 3);
+    const seeds = new Float32Array(points.length);
+    points.forEach(([lat, lon], i) => {
+      toVec(lat, lon, v);
+      positions.set([v.x, v.y, v.z], i * 3);
+      // Deterministic per point, so the shimmer pattern is stable between visits.
+      seeds[i] = Math.abs((Math.sin((i + level * 1e5) * 12.9898) * 43758.5453) % 1);
+    });
+    const g = new BufferGeometry();
+    g.setAttribute('position', new BufferAttribute(positions, 3));
+    g.setAttribute('aLevel', new BufferAttribute(new Float32Array(points.length).fill(level), 1));
+    g.setAttribute('aSeed', new BufferAttribute(seeds, 1));
+    return g;
   };
-  for (let i = 0; i < WORLD_POINTS; i++) if (on(i)) push(...worldPoint(i), 0);
+  const world = () => {
+    const points: [number, number][] = [];
+    for (let i = 0; i < WORLD_POINTS; i++) if (on(i)) points.push(worldPoint(i));
+    return build(points, 0);
+  };
   let base = WORLD_POINTS;
-  LEVELS.forEach((level, li) => {
-    const count = level.rows * level.cols;
-    for (let i = 0; i < count; i++) if (on(base + i)) push(...levelPoint(level, i), li + 1);
-    base += count;
+  const caps = LEVELS.map((level, li) => {
+    const start = base;
+    base += level.rows * level.cols;
+    return () => {
+      const points: [number, number][] = [];
+      for (let i = 0; i < level.rows * level.cols; i++) if (on(start + i)) points.push(levelPoint(level, i));
+      return build(points, li + 1);
+    };
   });
-  const g = new BufferGeometry();
-  g.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
-  g.setAttribute('aLevel', new BufferAttribute(new Float32Array(levels), 1));
-  g.setAttribute('aSeed', new BufferAttribute(new Float32Array(seeds.map(Math.abs)), 1));
-  return g;
+  return [world, ...caps];
 }
 
 /** The logo's pin as a solid: a teardrop with a hole, tip at the origin, one unit tall. */
@@ -388,7 +406,17 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     return null;
   }
   renderer.setClearColor(0x000000, 0);
-  const dpr = () => Math.min(window.devicePixelRatio || 1, 2);
+
+  // A software rasteriser (SwiftShader, llvmpipe) draws a frame in hundreds of
+  // milliseconds: there, the globe only redraws when something moves.
+  const gl = renderer.getContext();
+  const debug = gl.getExtension('WEBGL_debug_renderer_info');
+  const gpu = String(gl.getParameter(debug ? debug.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+  const software = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(gpu);
+
+  // Resolution scale: lowered while frames run long, raised again when they recover.
+  let quality = software ? 0.5 : 1;
+  const dpr = () => Math.min(window.devicePixelRatio || 1, 2) * quality;
   renderer.setPixelRatio(dpr());
 
   const scene = new Scene();
@@ -445,8 +473,24 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     transparent: true,
     depthWrite: false,
   });
-  const land = new Points(landGeometry(bits), landMat);
-  globe.add(land);
+  const levels = landLevels(bits);
+  const lands: (Points | null)[] = levels.map(() => null);
+  const addLevel = (i: number) => {
+    if (lands[i]) return;
+    lands[i] = new Points(levels[i](), landMat);
+    globe.add(lands[i]!);
+  };
+  addLevel(0);
+  // The finer levels only show during the dive: build them while the browser is idle.
+  const idle = (cb: () => void) =>
+    'requestIdleCallback' in window ? requestIdleCallback(cb, { timeout: 2000 }) : setTimeout(cb, 150);
+  let destroyed = false;
+  const buildNext = (i: number) => {
+    if (destroyed || i >= levels.length) return;
+    addLevel(i);
+    idle(() => buildNext(i + 1));
+  };
+  idle(() => buildNext(1));
 
   // Pins: a dot of light on a thin stem, for posts around the world.
   const pinCount = PINS.length;
@@ -589,6 +633,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
       anchor.x = arrival.offsetLeft + (mobile ? w / 2 : w);
       anchor.y = arrival.offsetTop;
     }
+    measure();
     renderer.setPixelRatio(dpr());
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
@@ -596,10 +641,16 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     pinMat.uniforms.uPixel.value = dpr();
   }
 
+  // Measured on resize, so the loop never forces a layout.
+  let sectionTop = 0;
+  let sectionSpan = 1;
+  function measure() {
+    sectionTop = section.offsetTop;
+    sectionSpan = section.offsetHeight - window.innerHeight;
+  }
+
   function progress() {
-    const rect = section.getBoundingClientRect();
-    const span = rect.height - window.innerHeight;
-    return span > 0 ? clamp01(-rect.top / span) : 0;
+    return sectionSpan > 0 ? clamp01((window.scrollY - sectionTop) / sectionSpan) : 0;
   }
 
   /** Where everything wants to be at scroll progress p. The camera then chases it. */
@@ -663,6 +714,10 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     const mix = landMat.uniforms.uMix.value as number[];
     const perRadian = landMat.uniforms.uScale.value / dpr() / cur.alt;
     for (let i = 1; i < mix.length; i++) mix[i] = smooth(9, 15, spacing[i - 1] * perRadian);
+    mix.forEach((m, i) => {
+      if (m > 0.001) addLevel(i);
+      if (lands[i]) lands[i]!.visible = m > 0.001;
+    });
     landMat.uniforms.uHotRadius.value = lerp(0.004, 0.06, smooth(0.02, 1.2, cur.alt));
     const far = smooth(0.12, 0.8, cur.alt);
     pinMat.uniforms.uFade.value = far;
@@ -752,11 +807,23 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     if (hud.alt) hud.alt.textContent = km.toLocaleString('en-US');
   }
 
+  let lastP = -1;
+  let pointerMoved = false;
+
   function frame(dt: number) {
-    time += dt;
     const p = reduced ? 0 : progress();
+    // On a software renderer, hold still unless the page moves: no idle spin,
+    // no pulse, and no draw once the camera has settled.
+    if (software && started) {
+      const scrolled = Math.abs(p - lastP) > 1e-5;
+      const settling = Math.abs(cur.alt / goal(p).alt - 1) > 0.002;
+      if (!scrolled && !settling && !pointerMoved) return;
+    }
+    lastP = p;
+    pointerMoved = false;
+    if (!software) time += dt;
     // The idle spin slows to a stop as the dive begins.
-    if (!reduced) spin += dt * 0.045 * (1 - smooth(0, 0.08, p));
+    if (!reduced && !software) spin += dt * 0.045 * (1 - smooth(0, 0.08, p));
     // Keep the spin within half a turn of the target, so the dive always takes
     // the short way round. Shifting both by a full turn changes nothing on screen.
     if (spin > ryTarget + Math.PI) {
@@ -777,14 +844,37 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
   // ---------- loop ----------
 
   let lastTime = performance.now();
+  let slow = 0;
+  let fast = 0;
   const tick = () => {
     const now = performance.now();
     const dt = (now - lastTime) / 1000;
     lastTime = now;
-    if (visible) frame(dt);
+    if (!visible) return;
+    frame(dt);
+    // Adaptive resolution: a second of long frames steps the pixel ratio
+    // down, five seconds of smooth ones step it back up.
+    if (software || dt > 0.25) return;
+    slow = dt > 0.034 ? slow + dt : 0;
+    fast = dt < 0.02 ? fast + dt : 0;
+    if (slow > 1 && quality > 0.5) {
+      quality = Math.max(0.5, quality * 0.75);
+      slow = 0;
+      resize();
+    } else if (fast > 5 && quality < 1) {
+      quality = Math.min(1, quality / 0.75);
+      fast = 0;
+      resize();
+    }
   };
 
   resize();
+  // Compile the shaders off the main thread where the browser allows it.
+  try {
+    await renderer.compileAsync(scene, camera);
+  } catch {
+    // Older browsers compile on first draw instead.
+  }
   frame(0);
 
   const onResize = () => {
@@ -795,8 +885,12 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     if (e.pointerType !== 'mouse') return;
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
     pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
+    pointerMoved = !software;
   };
   window.addEventListener('resize', onResize);
+  // Fonts and images above the fold can change the page's height after load.
+  const sizes = new ResizeObserver(measure);
+  sizes.observe(document.body);
   window.addEventListener('pointermove', onPointer, { passive: true });
 
   const io = new IntersectionObserver(([entry]) => {
@@ -809,8 +903,10 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
 
   return {
     destroy() {
+      destroyed = true;
       gsap.ticker.remove(tick);
       io.disconnect();
+      sizes.disconnect();
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onPointer);
       scene.traverse((obj) => {

@@ -5,6 +5,21 @@ All notable changes to the Beenzer website will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- The site in 20 languages: English, Spanish, French, German, Italian, Brazilian Portuguese, Dutch, Turkish, Russian, Ukrainian, Arabic, Hebrew, Hindi, Thai, Vietnamese, Indonesian, Simplified and Traditional Chinese, Japanese and Korean, journal included. English stays at the root; the others live under their code (`/fr/`, `/zh-cn/`)
+- Right-to-left layout for Arabic and Hebrew, down to the globe, which lands on the other side of the copy
+- A language menu in the header, every language in the footer, and a one-time offer of the visitor's own language (no redirects)
+- `hreflang` alternates in every page and in the sitemap, per-language Open Graph locale and JSON-LD, and a 404 page per language
+- System fonts for Arabic, Hebrew, Devanagari, Thai and CJK scripts, with spacing and line heights set for them
+- The site notice says what the language choice keeps in the browser, and that the English version applies if a translation differs
+
+### Fixed
+
+- `npm run check` no longer fails on Lenis's private `updateClassName`
+
 ## [2.0.0] - 2026-10-20
 
 A rebuild from scratch, for Beenzer as a product of Nexow, Inc. (nexow.studio).

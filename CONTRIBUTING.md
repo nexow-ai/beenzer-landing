@@ -34,6 +34,8 @@ npm run dev
 ## House rules
 
 - **Facts only.** Every claim on the site has a source, noted next to it in `src/data/`. No invented numbers, users, quotes, dates or prices. If a fact is unknown, leave it out.
+- **Every word in every language.** Text on the page comes from `src/i18n/dict/`, never written into a component. Change `en.ts` and every other language with it; `npm run check` fails until they match. A translation says the same thing as the English, no more and no less. See [Languages](README.md#languages).
+- **Both directions.** Use logical properties (`inset-inline-start`, `margin-inline-end`, `text-align: start`) for anything that follows the line of reading, so Arabic and Hebrew mirror.
 - **Dependencies are pinned exactly** (`.npmrc`). Update them in a commit of their own, with the lockfile.
 - **One dark theme.** Colours, type and spacing come from the tokens in `src/styles/global.css`. Do not hard-code new colours in components.
 - **Motion with manners.** Every animation must respect `prefers-reduced-motion`, and nothing may trap or hijack the scroll.
@@ -45,6 +47,7 @@ npm run dev
 - [ ] `npm run check` and `npm run build` pass
 - [ ] Looks right at 390 px, 768 px and 1440 px wide
 - [ ] Works with `prefers-reduced-motion: reduce`
+- [ ] Reads right in a right-to-left language (`/ar/` or `/he/`) and a CJK one (`/ja/`)
 - [ ] No console errors, no broken links
 - [ ] Keyboard: every link and control can be reached and seen
 

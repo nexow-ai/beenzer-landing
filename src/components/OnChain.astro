@@ -206,8 +206,7 @@ const stack: { name: string; role: string; icon?: IconName }[] = [
   .pipe-steps::after {
     content: '';
     position: absolute;
-    left: 7px;
-    right: calc(100% / 7 - 7px);
+    inset-inline: 7px calc(100% / 7 - 7px);
     top: 7px;
     height: 2px;
     background: var(--line-strong);
@@ -221,6 +220,10 @@ const stack: { name: string; role: string; icon?: IconName }[] = [
   [data-pipe][data-run] .pipe-steps::after {
     transition: transform 4.2s linear;
     transform: scaleX(1);
+  }
+  /* The line fills from the first step, wherever the language puts it. */
+  :global([dir='rtl']) .pipe-steps::after {
+    transform-origin: right;
   }
   .pipe-steps li {
     position: relative;
@@ -336,14 +339,14 @@ const stack: { name: string; role: string; icon?: IconName }[] = [
     }
     .pipe-steps::before,
     .pipe-steps::after {
-      left: 7px;
-      right: auto;
+      inset-inline: 7px auto;
       top: 7px;
       bottom: 7px;
       width: 2px;
       height: auto;
     }
-    .pipe-steps::after {
+    .pipe-steps::after,
+    :global([dir='rtl']) .pipe-steps::after {
       transform-origin: top;
       transform: scaleY(0);
     }

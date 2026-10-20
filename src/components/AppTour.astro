@@ -17,39 +17,21 @@ import lights from '../assets/posts/lights.jpg';
 import crew from '../assets/posts/crew.jpg';
 import portrait from '../assets/posts/portrait.jpg';
 import duo from '../assets/posts/duo.jpg';
+import { useLocale } from '../i18n';
 
-const steps = [
-  {
-    id: 'map',
-    n: '00',
-    title: 'The map is home.',
-    body: 'Every pin is a photo or a video, left exactly where it was taken. Tap one to see it, and who was there.',
-  },
-  {
-    id: 'snap',
-    n: '01',
-    title: 'Snap it.',
-    body: 'Shoot a photo or a video, record a sound, or pick something from your gallery. Up to 20 MB a post.',
-  },
-  {
-    id: 'pin',
-    n: '02',
-    title: 'Pin it.',
-    body: 'Your post lands where you are standing. Then choose who can find it: everyone, or only people within the radius you set.',
-  },
-  {
-    id: 'share',
-    n: '03',
-    title: 'Share it.',
-    body: 'Follow friends and see their posts on the map or in your feed. Follow each other back and you can chat.',
-  },
-  {
-    id: 'mint',
-    n: '04',
-    title: 'Mint it.',
-    body: 'Any post can become a Solana NFT. Pick how many editions can exist and their price, approve in Phantom, and edition #1 lands in your wallet.',
-  },
-];
+const { t, unit, number } = useLocale(Astro.url);
+const phone = t.tour.phone;
+const places = t.places;
+const km = (n: number) => unit(n, 'kilometer');
+// "Within {distance}": the words around the live distance, in the language's order.
+const within = phone.within.split('{distance}') as [string, string?];
+
+// The steps' words are in the dictionary (tour.steps), in this order.
+const steps = (['map', 'snap', 'pin', 'share', 'mint'] as const).map((id, i) => ({
+  id,
+  n: String(i).padStart(2, '0'),
+  ...t.tour.steps[i],
+}));
 
 const mapPins = [
   { img: van, x: 22, y: 30, d: 0 },
@@ -62,8 +44,8 @@ const mapPins = [
 
 <section class="tour section" id="how" aria-labelledby="how-title" data-tour>
   <div class="container head">
-    <p class="eyebrow" data-reveal>How it works</p>
-    <h2 class="h2" id="how-title" data-split>A camera, a map, and a memory of where.</h2>
+    <p class="eyebrow" data-reveal>{t.tour.eyebrow}</p>
+    <h2 class="h2" id="how-title" data-split>{t.tour.title}</h2>
   </div>
 
   <div class="container layout">
@@ -79,10 +61,10 @@ const mapPins = [
               <p class="body">{step.body}</p>
               {step.id === 'pin' && (
                 <label class="try">
-                  <span class="mono">Try it · visible within</span>
-                  <input type="range" min="1" max="100" value="24" data-radius-input aria-label="Visibility radius in km" />
+                  <span class="mono">{t.tour.try}</span>
+                  <input type="range" min="1" max="100" value="24" data-radius-input aria-label={t.tour.radius} />
                   <output class="mono" data-radius-out>
-                    24 km
+                    {km(24)}
                   </output>
                 </label>
               )}
@@ -104,7 +86,7 @@ const mapPins = [
               <div class="topbar">
                 <div>
                   <b class="wordmark">BEENZER</b>
-                  <span class="place">Savigny</span>
+                  <span class="place">{places.savigny}</span>
                 </div>
                 <span class="round"><Icon name="search" size={16} /></span>
                 <span class="round badge"><Icon name="bell" size={16} /></span>
@@ -137,7 +119,7 @@ const mapPins = [
                 <Image src={selfie} alt="" width={96} height={96} loading="lazy" class="peek-img" />
                 <div>
                   <b>@mara</b>
-                  <span class="mono">Lutry · 2 h · 1.4 km</span>
+                  <span class="mono">{places.lutry} · {unit(2, 'hour', 'narrow')} · {km(1.4)}</span>
                   <span class="peek-likes">
                     <Icon name="heart" size={12} /> 128 <Icon name="message-circle" size={12} /> 14
                   </span>
@@ -161,7 +143,7 @@ const mapPins = [
                 <span class="round dark"><Icon name="zap" size={16} /></span>
               </div>
               <div class="cam-bottom">
-                <div class="modes mono"><span>Audio</span><span>Photo</span><b>Video</b></div>
+                <div class="modes mono"><span>{phone.audio}</span><span>{phone.photo}</span><b>{phone.video}</b></div>
                 <div class="shutter-row">
                   <span class="gallery"><Image src={duo} alt="" width={64} height={64} loading="lazy" /></span>
                   <span class="shutter"><i></i></span>
@@ -172,12 +154,14 @@ const mapPins = [
 
             <!-- 02 · pin -->
             <div class="scr scr-pin" data-scr="pin">
-              <div class="bar"><Icon name="arrow-right" size={18} class="back" /><b>New post</b><span></span></div>
+              <div class="bar"><Icon name="arrow-right" size={18} class="back" /><b>{phone.newPost}</b><span></span></div>
               <div class="draft">
                 <img src="/media/camera.webp" alt="" width="64" height="112" loading="lazy" decoding="async" />
                 <div>
-                  <p>Neon hour 💚</p>
-                  <span class="chip-s mono"><Icon name="map-pin" size={11} /> Savigny · 46.54° N 6.72° E</span>
+                  <p>{phone.caption}</p>
+                  <span class="chip-s mono"
+                    ><Icon name="map-pin" size={11} /> {places.savigny} · <bdi>46.54° N 6.72° E</bdi></span
+                  >
                 </div>
               </div>
               <div class="radius-map">
@@ -189,32 +173,34 @@ const mapPins = [
                   <circle cx="130" cy="78" r="38" class="radius" data-radius-circle></circle>
                   <circle cx="130" cy="78" r="4.5" fill="#16fd82"></circle>
                 </svg>
-                <span class="radius-label mono" data-radius-label>24 km</span>
+                <span class="radius-label mono" data-radius-label>{km(24)}</span>
               </div>
               <div class="field">
-                <span class="label mono">Who can find it</span>
-                <div class="seg"><span>Everyone</span><b>Nearby</b></div>
+                <span class="label mono">{phone.who}</span>
+                <div class="seg"><span>{phone.everyone}</span><b>{phone.nearby}</b></div>
               </div>
               <div class="field">
-                <span class="label mono">Within <span data-radius-text>24 km</span></span>
+                <span class="label mono"
+                  >{within[0]}<span data-radius-text>{km(24)}</span>{within[1]}</span
+                >
                 <span class="slider"><i data-radius-fill style="--v:0.24"></i></span>
               </div>
               <div class="field row">
-                <span>Editions</span>
+                <span>{phone.editions}</span>
                 <span class="stepper mono"><i>−</i><b>20</b><i>+</i></span>
               </div>
-              <span class="cta-btn">Drop it here</span>
+              <span class="cta-btn">{phone.drop}</span>
             </div>
 
             <!-- 03 · share -->
             <div class="scr scr-share" data-scr="share">
               <div class="bar"><b class="wordmark">BEENZER</b><span class="round"><Icon name="bell" size={15} /></span></div>
-              <div class="seg wide"><b>Friends</b><span>Public</span></div>
+              <div class="seg wide"><b>{phone.friends}</b><span>{phone.public}</span></div>
               <div class="feed">
                 <article class="post">
                   <header>
                     <Image src={portrait} alt="" width={48} height={48} loading="lazy" class="av" />
-                    <div><b>@jonas</b><span class="mono">Lausanne · 12 min</span></div>
+                    <div><b>@jonas</b><span class="mono">{places.lausanne} · {unit(12, 'minute', 'narrow')}</span></div>
                   </header>
                   <video
                     muted
@@ -227,13 +213,13 @@ const mapPins = [
                     <span><Icon name="heart" size={14} /> 86</span>
                     <span><Icon name="message-circle" size={14} /> 9</span>
                     <span><Icon name="share-2" size={14} /></span>
-                    <span class="mono km">2.1 km</span>
+                    <span class="mono km">{km(2.1)}</span>
                   </footer>
                 </article>
                 <article class="post">
                   <header>
                     <Image src={friends} alt="" width={48} height={48} loading="lazy" class="av" />
-                    <div><b>@lea</b><span class="mono">Vevey · 1 h</span></div>
+                    <div><b>@lea</b><span class="mono">{places.vevey} · {unit(1, 'hour', 'narrow')}</span></div>
                   </header>
                   <video
                     muted
@@ -246,7 +232,7 @@ const mapPins = [
               </div>
               <div class="toast">
                 <Image src={portrait} alt="" width={40} height={40} loading="lazy" class="av" />
-                <div><b>Jonas</b><span>Still at the lake? 🌅</span></div>
+                <div><b>Jonas</b><span>{phone.message}</span></div>
               </div>
             </div>
 
@@ -254,18 +240,22 @@ const mapPins = [
             <div class="scr scr-mint" data-scr="mint">
               <div class="sheet">
                 <span class="grabber"></span>
-                <b class="sheet-title">Mint on Solana</b>
+                <b class="sheet-title">{phone.mint}</b>
                 <div class="sheet-rows mono">
-                  <div><span>Editions</span><b>20</b></div>
-                  <div><span>Price each</span><b>0.1 SOL</b></div>
-                  <div><span>Royalties</span><b>10%</b></div>
+                  <div><span>{phone.editions}</span><b>20</b></div>
+                  <div><span>{phone.price}</span><b>{number(0.1)} SOL</b></div>
+                  <div><span>{phone.royalties}</span><b>{number(0.1, { style: 'percent' })}</b></div>
                 </div>
-                <span class="phantom"><Icon name="wallet" size={15} /> Approve in Phantom</span>
+                <span class="phantom"><Icon name="wallet" size={15} /> {phone.approve}</span>
                 <ol class="logs mono" role="list">
-                  <li style="--i:0"><i></i>Media saved to Arweave</li>
-                  <li style="--i:1"><i></i>Metadata saved to Arweave</li>
-                  <li style="--i:2"><i></i>Minted in the Beenzer collection</li>
-                  <li style="--i:3"><i></i>Edition #1 sent to your wallet</li>
+                  {
+                    phone.logs.map((log, i) => (
+                      <li style={`--i:${i}`}>
+                        <i />
+                        {log}
+                      </li>
+                    ))
+                  }
                 </ol>
               </div>
             </div>
@@ -381,7 +371,7 @@ const mapPins = [
   }
   .try output {
     min-width: 4.5em;
-    text-align: right;
+    text-align: end;
     color: var(--neon);
   }
 
@@ -521,7 +511,7 @@ const mapPins = [
     content: '';
     position: absolute;
     top: 0.45em;
-    right: 0.5em;
+    inset-inline-end: 0.5em;
     width: 0.55em;
     height: 0.55em;
     border-radius: 50%;
@@ -550,7 +540,7 @@ const mapPins = [
   }
   .topbar > div {
     display: grid;
-    margin-right: auto;
+    margin-inline-end: auto;
     line-height: 1.15;
   }
   .place {
@@ -891,7 +881,7 @@ const mapPins = [
   }
   .radius-label {
     position: absolute;
-    right: 0.6em;
+    inset-inline-end: 0.6em;
     top: 0.6em;
     padding: 0.2em 0.6em;
     border-radius: 99px;
@@ -947,7 +937,8 @@ const mapPins = [
   }
   .slider i {
     position: absolute;
-    inset: 0 auto 0 0;
+    inset-block: 0;
+    inset-inline-start: 0;
     width: calc(var(--v) * 100%);
     border-radius: inherit;
     background: #22c55e;
@@ -956,7 +947,7 @@ const mapPins = [
   .slider i::after {
     content: '';
     position: absolute;
-    right: -0.7em;
+    inset-inline-end: -0.7em;
     top: 50%;
     width: 1.4em;
     height: 1.4em;
@@ -1053,7 +1044,7 @@ const mapPins = [
     gap: 0.3em;
   }
   .post footer .km {
-    margin-left: auto;
+    margin-inline-start: auto;
     color: #22c55e;
   }
   .toast {
@@ -1321,8 +1312,15 @@ const mapPins = [
     const label = device.querySelector<HTMLElement>('[data-radius-label]');
     const text = device.querySelector<HTMLElement>('[data-radius-text]');
     const fill = device.querySelector<HTMLElement>('[data-radius-fill]');
+    // "24 km" as the page's language writes it, in Western digits like the rest of the site.
+    const distance = new Intl.NumberFormat(document.documentElement.lang || 'en', {
+      style: 'unit',
+      unit: 'kilometer',
+      unitDisplay: 'short',
+      numberingSystem: 'latn',
+    });
     function setRadius(km: number) {
-      const value = `${km} km`;
+      const value = distance.format(km);
       if (out) out.value = value;
       if (label) label.textContent = value;
       if (text) text.textContent = value;

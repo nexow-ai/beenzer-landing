@@ -12,57 +12,55 @@ import crew from '../assets/posts/crew.jpg';
 import lights from '../assets/posts/lights.jpg';
 import glam from '../assets/posts/glam.jpg';
 import { FEATURED, formatLat, formatLon, shortKey } from '../data/site';
+import { fill, useLocale } from '../i18n';
 
+const { t, country } = useLocale(Astro.url);
+const labels = t.showcase.meta;
+
+// The values are the token's own (src/data/site.ts); only the country's name is translated.
 const meta = [
-  ['City', `${FEATURED.city}, ${FEATURED.country}`],
-  ['Coordinates', `${formatLat(FEATURED.latitude, 2)}, ${formatLon(FEATURED.longitude, 2)}`],
-  ['Date', FEATURED.date],
-  ['Time UTC', FEATURED.timeUtc],
-  ['Visibility', FEATURED.visibility],
-  ['Supply', String(FEATURED.supply)],
-  ['Floor', FEATURED.floor],
-  ['Creator', shortKey(FEATURED.creator)],
+  [labels.city, `${FEATURED.city}, ${country('CH')}`],
+  [labels.coordinates, `${formatLat(FEATURED.latitude, 2)}, ${formatLon(FEATURED.longitude, 2)}`],
+  [labels.date, FEATURED.date],
+  [labels.time, FEATURED.timeUtc],
+  [labels.visibility, FEATURED.visibility],
+  [labels.supply, String(FEATURED.supply)],
+  [labels.floor, FEATURED.floor],
+  [labels.creator, shortKey(FEATURED.creator)],
 ];
 
 /** What the server writes into every Beenzer's metadata (server/src/services/nfts/mintNFT.ts). */
-const carries = [
-  ['Who', 'Creator wallet and username'],
-  ['What', 'The media and its type: photo, video or sound'],
-  ['When', 'Date and time, in UTC'],
-  ['Where', 'City, latitude and longitude'],
-  ['Who can see it', 'The visibility radius, as a box on the map'],
-  ['How many', 'Supply and floor price'],
-];
+const carries = t.showcase.carries;
 
 // An illustration of posts, not real ones: photos with a place under them.
 const moments = [
-  { img: van, place: 'Tarifa', lat: 36.01, lon: -5.6 },
-  { img: friends, place: 'Lisbon', lat: 38.72, lon: -9.14 },
-  { img: concert, place: 'Berlin', lat: 52.52, lon: 13.4 },
-  { img: selfie2, place: 'Barcelona', lat: 41.39, lon: 2.17 },
-  { img: duo, place: 'Lagos', lat: 6.52, lon: 3.38 },
-  { img: crew, place: 'Mexico City', lat: 19.43, lon: -99.13 },
-  { img: lights, place: 'Lausanne', lat: 46.52, lon: 6.63 },
-  { img: glam, place: 'Paris', lat: 48.86, lon: 2.35 },
+  { img: van, place: t.places.tarifa, lat: 36.01, lon: -5.6 },
+  { img: friends, place: t.places.lisbon, lat: 38.72, lon: -9.14 },
+  { img: concert, place: t.places.berlin, lat: 52.52, lon: 13.4 },
+  { img: selfie2, place: t.places.barcelona, lat: 41.39, lon: 2.17 },
+  { img: duo, place: t.places.lagos, lat: 6.52, lon: 3.38 },
+  { img: crew, place: t.places.mexicoCity, lat: 19.43, lon: -99.13 },
+  { img: lights, place: t.places.lausanne, lat: 46.52, lon: 6.63 },
+  { img: glam, place: t.places.paris, lat: 48.86, lon: 2.35 },
 ];
 ---
 
 <section class="showcase section" id="proof" aria-labelledby="proof-title">
   <div class="container grid">
     <div class="card-stage" data-reveal>
-      <article class="nft" data-tilt aria-label={`${FEATURED.name}, the card`}>
+      <article class="nft" data-tilt aria-label={fill(t.showcase.card, { name: FEATURED.name })}>
         <div class="nft-inner">
           <div class="nft-photo">
             <Image
               src={selfie}
-              alt="The photo minted as BEENZER #18: Vincent, taking a selfie indoors."
+              alt={t.showcase.alt}
               widths={[360, 540, 720]}
               sizes="(max-width: 900px) 80vw, 380px"
               loading="lazy"
             />
             <div class="nft-top">
               <span class="mono">{FEATURED.name}</span>
-              <span class="nft-desc" aria-label="Description">{FEATURED.description}</span>
+              <span class="nft-desc" aria-label={t.showcase.description}>{FEATURED.description}</span>
             </div>
             <span class="nft-user mono">@{FEATURED.username}</span>
           </div>
@@ -71,7 +69,9 @@ const moments = [
               meta.map(([k, v]) => (
                 <div>
                   <dt>{k}</dt>
-                  <dd>{v}</dd>
+                  <dd>
+                    <bdi>{v}</bdi>
+                  </dd>
                 </div>
               ))
             }
@@ -87,12 +87,9 @@ const moments = [
     </div>
 
     <div class="copy">
-      <p class="eyebrow" data-reveal>On the record</p>
-      <h2 class="h2" id="proof-title" data-split>Proof you were there.</h2>
-      <p class="lead" data-reveal>
-        Mint a post and the moment is written into it, for good. This is BEENZER #18, minted in Savigny on 16
-        February 2023. Its photo and its metadata still sit on Arweave, exactly as they were written.
-      </p>
+      <p class="eyebrow" data-reveal>{t.showcase.eyebrow}</p>
+      <h2 class="h2" id="proof-title" data-split>{t.showcase.title}</h2>
+      <p class="lead" data-reveal>{t.showcase.lead}</p>
       <dl class="carries" data-reveal>
         {
           carries.map(([k, v]) => (
@@ -105,13 +102,14 @@ const moments = [
       </dl>
       <div class="links" data-reveal>
         <a class="btn ghost" href={FEATURED.solscan} target="_blank" rel="noopener">
-          See #18 on Solscan <Icon name="arrow-up-right" />
+          {t.showcase.solscan} <Icon name="arrow-up-right" />
         </a>
       </div>
     </div>
   </div>
 
-  <div class="moments" aria-hidden="true" data-anim>
+  <!-- Left to right in every language: the strip runs one way. -->
+  <div class="moments" aria-hidden="true" dir="ltr" data-anim>
     <div class="track">
       {
         [0, 1].map(() =>
@@ -204,7 +202,7 @@ const moments = [
   }
   .nft-user {
     position: absolute;
-    left: 14px;
+    inset-inline-start: 14px;
     bottom: 14px;
     padding: 5px 10px;
     border-radius: 99px;

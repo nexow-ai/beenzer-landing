@@ -3,9 +3,10 @@ import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import selfie from '../assets/beenzer-18.jpg';
 import { FEATURED, formatLat, formatLon } from '../data/site';
+import { fill, rich, useLocale } from '../i18n';
 
-const date = new Date(`${FEATURED.date}T${FEATURED.timeUtc}Z`);
-const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const { t, date: formatDate } = useLocale(Astro.url);
+const day = formatDate(new Date(`${FEATURED.date}T${FEATURED.timeUtc}Z`), { day: 'numeric', month: 'short', year: 'numeric' });
 ---
 
 <!--
@@ -41,30 +42,27 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
     <div class="intro container" data-intro>
       <p class="chip status">
         <span class="live-dot" aria-hidden="true"></span>
-        Being rebuilt in Flutter · iOS &amp; Android
+        {t.hero.status}
       </p>
-      <h1 class="display headline">
+      <!-- The brand line is the same in every language. -->
+      <h1 class="display headline" lang="en" translate="no">
         <span class="line"><span>Beenzer.</span></span>
         <span class="line"><span class="grad-text">Done that.</span></span>
       </h1>
-      <p class="lead">
-        Beenzer pins your photos and videos to the exact place you took them. Follow friends, find them on the map,
-        and keep any moment as a Solana NFT, with the place and the time written into it.
-      </p>
+      <p class="lead">{t.hero.lead}</p>
       <div class="actions">
-        <a class="btn" href="#how">See how it works <Icon name="arrow-down" /></a>
-        <a class="btn ghost" href="#follow">Follow the build</a>
+        <a class="btn" href="#how">{t.hero.how} <Icon name="arrow-down" /></a>
+        <a class="btn ghost" href="#follow">{t.hero.follow}</a>
       </div>
     </div>
 
     <div class="hud mono" aria-hidden="true">
-      <span>Lat <b data-hud-lat>—</b></span>
-      <span>Lon <b data-hud-lon>—</b></span>
-      <span>Alt <b data-hud-alt>—</b> km</span>
+      <span>{t.hero.lat} <b dir="ltr" data-hud-lat>—</b></span>
+      <span>{t.hero.lon} <b dir="ltr" data-hud-lon>—</b></span>
+      <span>{t.hero.alt} <b dir="ltr" data-hud-alt>—</b> km</span>
     </div>
 
-    <p class="beat h2" data-beat>Every photo was taken <em>somewhere.</em></p>
-    <p class="beat h2" data-beat>Most apps forget where. <span class="grad-text">Beenzer keeps it.</span></p>
+    {t.hero.beats.map((beat) => <p class="beat h2" data-beat set:html={rich(beat)} />)}
 
     <svg class="leader" aria-hidden="true"><line data-leader x1="0" y1="0" x2="0" y2="0"></line><circle
         data-leader-dot
@@ -72,34 +70,38 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
 
     <article class="arrival" data-arrival aria-labelledby="arrival-title">
       <p class="arrival-kicker mono">{day} · {FEATURED.timeUtc.slice(0, 5)} UTC</p>
-      <h2 class="arrival-title h3" id="arrival-title">Vincent was here.</h2>
+      <h2 class="arrival-title h3" id="arrival-title">{t.hero.arrival.title}</h2>
       <div class="arrival-body">
         <Image
           src={selfie}
-          alt="The photo of BEENZER #18: a selfie of Vincent at home."
+          alt={t.hero.arrival.alt}
           widths={[120, 240]}
           sizes="120px"
           class="arrival-photo"
           loading="lazy"
         />
         <dl class="arrival-meta mono">
-          <div><dt>Token</dt><dd>{FEATURED.name}</dd></div>
-          <div><dt>Place</dt><dd>{FEATURED.city}, CH</dd></div>
+          <div><dt>{t.hero.arrival.token}</dt><dd>{FEATURED.name}</dd></div>
+          <div><dt>{t.hero.arrival.place}</dt><dd>{FEATURED.city}, CH</dd></div>
           <div>
-            <dt>Coords</dt><dd>{formatLat(FEATURED.latitude, 2)}, {formatLon(FEATURED.longitude, 2)}</dd>
+            <dt>{t.hero.arrival.coords}</dt>
+            <dd><bdi>{formatLat(FEATURED.latitude, 2)}, {formatLon(FEATURED.longitude, 2)}</bdi></dd>
           </div>
-          <div><dt>Seen within</dt><dd>{FEATURED.visibility}</dd></div>
-          <div><dt>Supply</dt><dd>{FEATURED.supply} · floor {FEATURED.floor}</dd></div>
+          <div><dt>{t.hero.arrival.seen}</dt><dd>{FEATURED.visibility}</dd></div>
+          <div>
+            <dt>{t.hero.arrival.supply}</dt>
+            <dd>{FEATURED.supply} · {fill(t.hero.arrival.floor, { price: FEATURED.floor })}</dd>
+          </div>
         </dl>
       </div>
       <a class="arrival-link" href={FEATURED.solscan} target="_blank" rel="noopener">
-        Check it on Solscan <Icon name="arrow-up-right" size={16} />
+        {t.hero.arrival.solscan} <Icon name="arrow-up-right" size={16} />
       </a>
     </article>
 
     <a class="cue mono" href="#how" data-cue>
       <span class="cue-line" aria-hidden="true"></span>
-      Scroll to land
+      {t.hero.cue}
     </a>
   </div>
 </section>
@@ -150,6 +152,21 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
       linear-gradient(90deg, rgb(5 5 6 / 0.85) 0%, rgb(5 5 6 / 0.35) 38%, transparent 60%),
       linear-gradient(0deg, rgb(5 5 6 / 0.9) 0%, transparent 26%),
       linear-gradient(180deg, rgb(5 5 6 / 0.65) 0%, transparent 18%);
+  }
+  /* Right-to-left: the copy is on the right, so the shade and the globe swap sides. */
+  :global([dir='rtl']) .shade {
+    background:
+      linear-gradient(270deg, rgb(5 5 6 / 0.85) 0%, rgb(5 5 6 / 0.35) 38%, transparent 60%),
+      linear-gradient(0deg, rgb(5 5 6 / 0.9) 0%, transparent 26%),
+      linear-gradient(180deg, rgb(5 5 6 / 0.65) 0%, transparent 18%);
+  }
+  /* The poster cannot be mirrored (the continents would be): slide it left instead.
+     Its globe spans the right 62% of a 1.6:1 picture. */
+  @media (min-width: 821px) and (min-aspect-ratio: 9/10) {
+    :global([dir='rtl']) .poster {
+      background-size: auto 100%;
+      background-position: calc(-0.576 * 100svh) 50%;
+    }
   }
 
   .intro {
@@ -206,7 +223,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
 
   .hud {
     position: absolute;
-    right: var(--gutter);
+    inset-inline-end: var(--gutter);
     bottom: clamp(24px, 4vh, 40px);
     display: flex;
     gap: 22px;
@@ -224,7 +241,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
 
   .beat {
     position: absolute;
-    left: var(--gutter);
+    inset-inline-start: var(--gutter);
     top: 50%;
     margin-top: -1em;
     max-width: 12ch;
@@ -233,7 +250,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
     text-shadow: 0 2px 40px rgb(0 0 0 / 0.6);
     will-change: transform, opacity;
   }
-  .beat em {
+  .beat :global(em) {
     font-style: normal;
     color: var(--neon);
   }
@@ -258,7 +275,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
 
   .arrival {
     position: absolute;
-    left: var(--gutter);
+    inset-inline-start: var(--gutter);
     top: 50%;
     translate: 0 -50%;
     width: min(400px, calc(100vw - var(--gutter) * 2));
@@ -312,7 +329,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
     color: var(--text-3);
   }
   .arrival-meta dd {
-    text-align: right;
+    text-align: end;
   }
   .arrival-link {
     display: inline-flex;
@@ -391,8 +408,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
     .hud {
       top: calc(var(--header-h) + 8px);
       bottom: auto;
-      left: var(--gutter);
-      right: auto;
+      inset-inline: var(--gutter) auto;
       gap: 14px;
       font-size: 0.62rem;
     }
@@ -407,7 +423,7 @@ const day = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', y
       top: auto;
       bottom: 16px;
       translate: 0 0;
-      left: var(--gutter);
+      inset-inline-start: var(--gutter);
       padding: 18px;
     }
     .arrival-title {

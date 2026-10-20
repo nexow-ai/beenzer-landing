@@ -11,10 +11,12 @@ interface Props {
 
 const { name, size = 20, class: className, label } = Astro.props;
 const icon = ICONS[name];
+// Arrows that point along the line of reading turn around in right-to-left pages (global.css).
+const directional = name === 'arrow-right' || name === 'arrow-up-right';
 ---
 
 <svg
-  class:list={['icon', className]}
+  class:list={['icon', { 'icon-dir': directional }, className]}
   width={size}
   height={size}
   viewBox="0 0 24 24"

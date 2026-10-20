@@ -2,9 +2,9 @@
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { FEATURED, SITE, SOCIAL, formatLat, formatLon } from '../data/site';
-import { LOCALES, fill, localizePath, unlocalizePath, useLocale } from '../i18n';
+import { LOCALES, localizePath, unlocalizePath, useLocale } from '../i18n';
 
-const { locale, t, path } = useLocale(Astro.url);
+const { locale, t, fill, path } = useLocale(Astro.url);
 const page = unlocalizePath(Astro.url.pathname);
 const here = page.startsWith('/404') ? '/' : page;
 
@@ -40,7 +40,7 @@ const columns = [
   <div class="container top">
     <div class="intro">
       <a href={path('/')} aria-label={t.meta.home}><Logo size={34} /></a>
-      <p class="tag" lang="en" translate="no">{SITE.tagline}</p>
+      <p class="tag" lang="en" translate="no"><bdi>{SITE.tagline}</bdi></p>
       <p class="body">{t.footer.body}</p>
     </div>
     {

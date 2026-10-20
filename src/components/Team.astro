@@ -3,9 +3,9 @@ import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import { team } from '../data/team';
 import { SITE } from '../data/site';
-import { fill, rich, useLocale } from '../i18n';
+import { rich, useLocale } from '../i18n';
 
-const { t } = useLocale(Astro.url);
+const { t, fill } = useLocale(Astro.url);
 const countries = new Set(team.map((m) => m.country)).size;
 const lead = fill(t.team.lead, { count: t.team.numbers[countries] ?? countries, company: SITE.owner.name });
 const role = (name: string) => t.team.roles[name as keyof typeof t.team.roles] ?? name;

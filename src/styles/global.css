@@ -71,6 +71,8 @@
   --font-script:
     'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', Meiryo, 'Noto Sans JP', 'Noto Sans CJK JP',
     sans-serif;
+  /* Lines break between phrases, not inside them, where the browser can tell. */
+  word-break: auto-phrase;
 }
 :root:lang(ko) {
   --font-script: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', sans-serif;

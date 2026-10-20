@@ -38,11 +38,13 @@ function smoothScroll() {
   // page mid-scroll. The site only needs "lenis" and "lenis-stopped".
   const root = document.documentElement;
   const instance = lenis;
-  instance.updateClassName = () => {
+  const updateClassName = () => {
     root.classList.add('lenis');
     root.classList.toggle('lenis-stopped', instance.isStopped);
   };
-  instance.updateClassName();
+  // Private in Lenis's types (1.3.26), but its own code calls it through the instance.
+  (instance as unknown as { updateClassName: () => void }).updateClassName = updateClassName;
+  updateClassName();
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis?.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);

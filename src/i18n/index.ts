@@ -63,6 +63,14 @@ export function fill(text: string, values: Record<string, string | number>): str
   return text.replace(/\{(\w+)\}/g, (match, key: string) => (key in values ? String(values[key]) : match));
 }
 
+/**
+ * Each value set off in its own direction (FSI…PDI, invisible): in a
+ * right-to-left sentence, "Nexow, Inc." keeps its full stop at its end.
+ */
+function isolate(values: Record<string, string | number>) {
+  return Object.fromEntries(Object.entries(values).map(([key, value]) => [key, `\u2068${value}\u2069`]));
+}
+
 const escapeHtml = (text: string) =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -100,6 +108,9 @@ export function useLocale(source: URL | Locale) {
     lang: info.lang,
     dir: info.dir ?? 'ltr',
     t: DICTS[locale],
+    /** fill() for text on the page, with the values isolated in right-to-left languages. */
+    fill: (text: string, values: Record<string, string | number>) =>
+      fill(text, info.dir === 'rtl' ? isolate(values) : values),
     path: (p: string) => localizePath(p, locale),
     date: (d: Date, options: Intl.DateTimeFormatOptions) =>
       new Intl.DateTimeFormat(intl, { timeZone: 'UTC', ...options }).format(d),

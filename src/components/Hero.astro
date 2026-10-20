@@ -3,9 +3,9 @@ import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import selfie from '../assets/beenzer-18.jpg';
 import { FEATURED, formatLat, formatLon } from '../data/site';
-import { fill, rich, useLocale } from '../i18n';
+import { rich, useLocale } from '../i18n';
 
-const { t, date: formatDate } = useLocale(Astro.url);
+const { t, fill, date: formatDate } = useLocale(Astro.url);
 const day = formatDate(new Date(`${FEATURED.date}T${FEATURED.timeUtc}Z`), { day: 'numeric', month: 'short', year: 'numeric' });
 ---
 
@@ -44,10 +44,10 @@ const day = formatDate(new Date(`${FEATURED.date}T${FEATURED.timeUtc}Z`), { day:
         <span class="live-dot" aria-hidden="true"></span>
         {t.hero.status}
       </p>
-      <!-- The brand line is the same in every language. -->
+      <!-- The brand line is the same in every language, and reads left to right in all of them. -->
       <h1 class="display headline" lang="en" translate="no">
-        <span class="line"><span>Beenzer.</span></span>
-        <span class="line"><span class="grad-text">Done that.</span></span>
+        <span class="line"><span dir="ltr">Beenzer.</span></span>
+        <span class="line"><span class="grad-text" dir="ltr">Done that.</span></span>
       </h1>
       <p class="lead">{t.hero.lead}</p>
       <div class="actions">
@@ -161,11 +161,13 @@ const day = formatDate(new Date(`${FEATURED.date}T${FEATURED.timeUtc}Z`), { day:
       linear-gradient(180deg, rgb(5 5 6 / 0.65) 0%, transparent 18%);
   }
   /* The poster cannot be mirrored (the continents would be): slide it left instead.
-     Its globe spans the right 62% of a 1.6:1 picture. */
+     Its globe spans the right 62% of a 1.6:1 picture and is cut by its right
+     edge, which now lands at 102.4svh: fade out before it. */
   @media (min-width: 821px) and (min-aspect-ratio: 9/10) {
     :global([dir='rtl']) .poster {
       background-size: auto 100%;
       background-position: calc(-0.576 * 100svh) 50%;
+      mask-image: linear-gradient(90deg, #000 72svh, transparent 101svh);
     }
   }
 

@@ -1,6 +1,8 @@
 // @ts-check
+import { rename, rm } from 'node:fs/promises';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { DEFAULT_LOCALE, LOCALES } from './src/i18n/locales.ts';
 
 /**
  * Lightning CSS turns the Latin range `U+0000-00FF` into `U+??`, which is not
@@ -24,6 +26,29 @@ function keepLatinFontRange() {
   };
 }
 
+/**
+ * Astro writes /404 as 404.html but /fr/404 as fr/404/index.html. The Worker
+ * answers a missing page with the nearest 404.html up the path
+ * (wrangler.jsonc, not_found_handling), so each language's goes to
+ * fr/404.html, and /fr/anything gets the French one.
+ * @returns {import('astro').AstroIntegration}
+ */
+function localeNotFoundPages() {
+  return {
+    name: 'locale-404-pages',
+    hooks: {
+      'astro:build:done': async ({ dir }) => {
+        for (const { code } of LOCALES) {
+          if (code === DEFAULT_LOCALE) continue;
+          const folder = new URL(`${code}/404/`, dir);
+          await rename(new URL('index.html', folder), new URL(`${code}/404.html`, dir));
+          await rm(folder, { recursive: true });
+        }
+      },
+    },
+  };
+}
+
 // The site's own address, for canonical links, Open Graph, the sitemap and
 // robots.txt: beenzer.xyz, where the Worker serves it. Set SITE_URL to build
 // for another host.
@@ -40,5 +65,15 @@ export default defineConfig({
     // three.js is one deferred chunk of about 570 kB (140 kB gzipped), loaded after first paint.
     build: { chunkSizeWarningLimit: 650 },
   },
-  integrations: [sitemap({ filter: (page) => !page.includes('/404') })],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/404'),
+      // Every page links its other languages (hreflang).
+      i18n: {
+        defaultLocale: DEFAULT_LOCALE,
+        locales: Object.fromEntries(LOCALES.map((l) => [l.code, l.lang])),
+      },
+    }),
+    localeNotFoundPages(),
+  ],
 });

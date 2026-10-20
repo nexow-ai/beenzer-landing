@@ -28,9 +28,13 @@
   --grad: linear-gradient(100deg, var(--teal) 0%, var(--neon) 62%, var(--lime) 100%);
   --glow: 0 0 0 1px rgb(22 253 130 / 0.25), 0 0 32px rgb(22 253 130 / 0.25);
 
-  --font-display: 'Unbounded Variable', 'Unbounded', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* --font-script: the system faces for a language whose letters the brand
+     fonts do not have (below). Latin, Cyrillic and Vietnamese are in them. */
+  --font-display: 'Unbounded Variable', 'Unbounded', var(--font-script, ui-sans-serif), system-ui, sans-serif;
+  --font-body:
+    'Geist Variable', 'Geist', var(--font-script, ui-sans-serif), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    'Geist Mono Variable', 'Geist Mono', var(--font-script, ui-monospace), 'SFMono-Regular', Menlo, monospace;
 
   --gutter: clamp(16px, 4vw, 56px);
   --max: 1320px;
@@ -39,6 +43,63 @@
   --header-h: 72px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ---------- languages ---------- */
+
+/* Each script falls back to the faces its own systems ship (Apple, Windows,
+   Android): nothing to download, and nothing fetched from anyone else. */
+:root:lang(ar) {
+  --font-script: 'Geeza Pro', 'SF Arabic', 'Segoe UI', 'Noto Sans Arabic', Tahoma, sans-serif;
+}
+:root:lang(he) {
+  --font-script: 'SF Hebrew', 'Arial Hebrew', 'Segoe UI', 'Noto Sans Hebrew', Arial, sans-serif;
+}
+:root:lang(hi) {
+  --font-script: 'Kohinoor Devanagari', 'Devanagari Sangam MN', 'Nirmala UI', 'Noto Sans Devanagari', Mangal, sans-serif;
+}
+:root:lang(th) {
+  --font-script: 'Sukhumvit Set', Thonburi, 'Leelawadee UI', 'Noto Sans Thai', Tahoma, sans-serif;
+}
+:root:lang(zh-CN) {
+  --font-script: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Noto Sans CJK SC', sans-serif;
+}
+:root:lang(zh-TW) {
+  --font-script: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
+}
+:root:lang(ja) {
+  --font-script:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', Meiryo, 'Noto Sans JP', 'Noto Sans CJK JP',
+    sans-serif;
+}
+:root:lang(ko) {
+  --font-script: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', sans-serif;
+  /* Korean breaks between words, like English. */
+  word-break: keep-all;
+}
+
+/* Tracking joins nothing in Arabic and breaks it apart; it cuts Devanagari's
+   headline and loosens a CJK grid. Those scripts set at their natural spacing,
+   brand words in English keep the house tracking. */
+:root:is(:lang(ar), :lang(he), :lang(hi), :lang(th), :lang(zh), :lang(ja), :lang(ko)) :where(body *):not(:lang(en)) {
+  letter-spacing: normal !important;
+}
+
+/* Headlines are set tight for Latin capitals. Taller scripts need the room,
+   and the line masks of the reveal (motion.ts) would clip their marks. */
+:root:is(:lang(ar), :lang(hi), :lang(th)) :is(.display, .h2, .h3, .title):not(:lang(en)) {
+  line-height: 1.35;
+}
+:root:is(:lang(he), :lang(zh), :lang(ja), :lang(ko)) :is(.display, .h2, .h3, .title):not(:lang(en)) {
+  line-height: 1.15;
+}
+:root:is(:lang(ar), :lang(hi), :lang(th)) :is(.lead, .body, .prose, .answer) {
+  line-height: 1.75;
+}
+
+/* Arrows along the line of reading point the other way in right-to-left pages (Icon.astro). */
+[dir='rtl'] .icon-dir {
+  scale: -1 1;
 }
 
 *,
@@ -196,7 +257,7 @@ html {
 
 .skip-link {
   position: fixed;
-  left: 16px;
+  inset-inline-start: 16px;
   top: -60px;
   z-index: 100;
   padding: 10px 16px;

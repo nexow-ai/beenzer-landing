@@ -600,6 +600,12 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
   const leaderLine = leader?.querySelector('line');
   const leaderDot = leader?.querySelector('circle');
   const anchor = { x: 0, y: 0 };
+  // Right-to-left pages put the copy on the right: the globe and the card's
+  // leader line swap sides. Numbers read in the page's language, in Western
+  // digits like the rest of the site (src/i18n/locales.ts).
+  const rtl = document.documentElement.dir === 'rtl';
+  const side = rtl ? -1 : 1;
+  const altitude = new Intl.NumberFormat(document.documentElement.lang || 'en', { numberingSystem: 'latn' });
   // The read-out changes every frame of the dive: write into its text nodes
   // in place, so no node is added to or removed from the page.
   const textNode = (sel: string) => {
@@ -636,7 +642,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     // The card's corner the leader line starts from (see .arrival in Hero.astro).
     if (arrival) {
       const w = arrival.offsetWidth;
-      anchor.x = arrival.offsetLeft + (mobile ? w / 2 : w);
+      anchor.x = arrival.offsetLeft + (mobile ? w / 2 : rtl ? 0 : w);
       anchor.y = arrival.offsetTop;
     }
     measure();
@@ -671,7 +677,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
       ry: lerp(spin, ryTarget, turn),
       // Pitch toward the horizon in the last stretch, looking north across the lake.
       tilt: 1.02 * smooth(0.5, 0.93, p),
-      ox: mobile ? 0 : lerp(0.44, 0.2, smooth(0.04, 0.5, p)),
+      ox: mobile ? 0 : side * lerp(0.44, 0.2, smooth(0.04, 0.5, p)),
       oy: mobile ? lerp(0.3, 0.12, smooth(0.04, 0.5, p)) : 0,
     };
   }
@@ -709,7 +715,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     camera.near = Math.max(0.00025, cur.alt * 0.02);
     camera.far = cur.alt + 3;
     camera.updateProjectionMatrix();
-    // Shift the picture without skewing it: the globe sits right of the copy
+    // Shift the picture without skewing it: the globe sits beside the copy
     // (or above it on a phone), then centres. Positive ox moves it right, oy up.
     camera.projectionMatrix.elements[8] -= cur.ox;
     camera.projectionMatrix.elements[9] -= cur.oy;
@@ -810,7 +816,7 @@ export async function mountGlobe(stage: HTMLElement, section: HTMLElement): Prom
     const km = Math.round(cur.alt * EARTH_KM);
     setText(hud.lat, `${Math.abs(lat).toFixed(2)}° ${lat >= 0 ? 'N' : 'S'}`);
     setText(hud.lon, `${Math.abs(lon).toFixed(2)}° ${lon >= 0 ? 'E' : 'W'}`);
-    setText(hud.alt, km.toLocaleString('en-US'));
+    setText(hud.alt, altitude.format(km));
   }
 
   function frame(dt: number) {

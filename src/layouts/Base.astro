@@ -31,7 +31,8 @@ const {
   schema = [],
 } = Astro.props;
 
-const fullTitle = title ? `${title} · Beenzer` : `Beenzer · ${SITE.tagline}`;
+// The brand line already says Beenzer; other pages add it after their own title.
+const fullTitle = title ? `${title} · Beenzer` : SITE.tagline.includes(SITE.name) ? SITE.tagline : `Beenzer · ${SITE.tagline}`;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const imageUrl = new URL(image, Astro.site).href;
 

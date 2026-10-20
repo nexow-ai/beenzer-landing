@@ -151,6 +151,31 @@ ol[role='list'] {
   color: #000;
 }
 
+/* Scrollbar: Beenzer neon green on the night map track. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon) var(--bg-raise);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-raise);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon);
+  border-radius: 999px;
+  border: 2px solid var(--bg-raise);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--lime);
+}
+
 :focus-visible {
   outline: 2px solid var(--neon);
   outline-offset: 3px;

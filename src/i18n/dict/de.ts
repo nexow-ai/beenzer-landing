@@ -47,7 +47,7 @@ const de: Dict = {
 
   hero: {
     status: 'Wird in Flutter neu gebaut · iOS & Android',
-    lead: 'Beenzer pinnt deine Fotos und Videos genau an den Ort, an dem du sie aufgenommen hast. Folge Freunden, finde sie auf der Karte und halte jeden Moment als Solana-NFT fest, mit Ort und Zeit fest darin eingeschrieben.',
+    lead: 'Beenzer pinnt deine Fotos und Videos genau an den Ort, an dem du sie aufgenommen hast. Folge Freunden, finde sie auf der Karte und halte jeden Moment als Solana-NFT fest, in das Ort und Zeit eingeschrieben sind.',
     how: 'So funktioniert’s',
     follow: 'Dranbleiben',
     lat: 'Breite',
@@ -170,7 +170,7 @@ const de: Dict = {
       },
       {
         title: 'Tantiemen, die mitreisen',
-        body: '10 % Tantiemen auf Weiterverkäufe, davon 80 % für den Creator und 20 % für Beenzer, durchgesetzt durch ein Metaplex-Regelwerk.',
+        body: '10 % Tantiemen auf Weiterverkäufe, davon 80 % für den Creator und 20 % für Beenzer, durchgesetzt durch ein Metaplex-Regelwerk.',
       },
     ],
     pipeTitle: 'Was beim Minten passiert',
@@ -306,7 +306,7 @@ const de: Dict = {
       },
       {
         q: 'Was sind Editionen und Tantiemen?',
-        a: 'Beim Minten legst du fest, wie viele Editionen es geben kann und was sie kosten. Edition #1 geht an dich. Jedes Beenzer-NFT wird mit 10 % Tantiemen auf Weiterverkäufe gemintet, davon 80 % für den Creator und 20 % für Beenzer.',
+        a: 'Beim Minten legst du fest, wie viele Editionen es geben kann und was sie kosten. Edition #1 geht an dich. Jedes Beenzer-NFT wird mit 10 % Tantiemen auf Weiterverkäufe gemintet, davon 80 % für den Creator und 20 % für Beenzer.',
       },
       {
         q: 'Wie groß darf ein Beitrag sein?',

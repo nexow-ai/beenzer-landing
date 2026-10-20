@@ -6,9 +6,8 @@ export const SITE = {
   name: 'Beenzer',
   /** Where this build is served: astro.config.mjs, from SITE_URL or beenzer.xyz. */
   url: (import.meta.env.SITE ?? 'https://beenzer.xyz').replace(/\/$/, ''),
+  /** The brand line, in English in every language. The site's description is in src/i18n/dict/ (meta.description). */
   tagline: 'Beenzer. Done that.',
-  description:
-    'Beenzer pins your photos and videos to the exact place you took them. Follow friends, find them on the map, and keep any moment as a Solana NFT, with its place and time written in.',
   /** Bump with each release of the site. */
   version: '2.0.0',
   x: '@beenzer_app',

@@ -56,10 +56,11 @@ const article = {
   .article {
     padding-top: calc(var(--header-h) + clamp(48px, 8vw, 110px));
   }
+  /* Header and body share one column, so their left edges line up. */
   .head {
     display: grid;
     gap: 22px;
-    max-width: calc(52rem + var(--gutter) * 2);
+    max-width: calc(46rem + var(--gutter) * 2);
   }
   .back {
     display: inline-flex;
@@ -103,7 +104,7 @@ const article = {
     max-width: 46ch;
   }
   .prose {
-    max-width: 44rem;
+    max-width: 46rem;
     margin: clamp(48px, 7vw, 88px) auto 0;
     padding-bottom: clamp(72px, 10vw, 120px);
     color: var(--text-2);

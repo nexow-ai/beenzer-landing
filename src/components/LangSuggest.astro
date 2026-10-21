@@ -23,7 +23,8 @@ const json = JSON.stringify(offers).replace(/</g, '\\u003c');
 <aside class="suggest" data-suggest data-locale={locale} hidden>
   <p data-suggest-text></p>
   <div class="actions">
-    <a class="btn" data-suggest-go></a>
+    <!-- A real address for crawlers; the script points it at the offered language. -->
+    <a class="btn" href={Astro.url.pathname} data-suggest-go></a>
     <button class="btn ghost" type="button" data-suggest-close></button>
   </div>
   <script is:inline type="application/json" data-suggest-offers set:html={json} />

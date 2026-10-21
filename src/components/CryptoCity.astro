@@ -71,13 +71,13 @@ const pins = [
     mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 45%, transparent);
   }
 
-  /* The wordmark stands behind the city, like the sun in a synthwave sky. */
+  /* The wordmark stands behind the city, like the sun in a synthwave sky, sized to the width. */
   .word {
-    inset: 4% 0 auto;
+    inset: 1% 0 auto;
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 23.5vw;
-    line-height: 0.74;
+    font-size: 17.6vw;
+    line-height: 1;
     letter-spacing: -0.06em;
     text-align: center;
     background: linear-gradient(180deg, rgb(22 253 130 / 0.42), rgb(22 253 130 / 0.04) 70%);
@@ -282,9 +282,12 @@ const pins = [
         visible = entry!.isIntersecting;
         if (visible && !started) {
           started = true;
-          reset();
-          new ResizeObserver(reset).observe(canvas);
-          if (reduced) for (let i = 0; i < 120; i++) step();
+          // Sizing the canvas clears it; it is sized when observed and again on each resize.
+          new ResizeObserver(() => {
+            reset();
+            // One still frame, with the streams part of the way down.
+            if (reduced) for (let i = 0; i < 40; i++) step();
+          }).observe(canvas);
         }
         sync();
       },

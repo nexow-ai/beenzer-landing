@@ -1,12 +1,15 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
+import CryptoCity from './CryptoCity.astro';
 import { FEATURED, SITE, SOCIAL, formatLat, formatLon } from '../data/site';
 import { LOCALES, localizePath, unlocalizePath, useLocale } from '../i18n';
 
 const { locale, t, fill, path } = useLocale(Astro.url);
 const page = unlocalizePath(Astro.url.pathname);
 const here = page.startsWith('/404') ? '/' : page;
+// The home page ends in the night city; every other page in the wordmark alone.
+const home = page === '/';
 
 const year = new Date().getFullYear();
 const columns = [
@@ -98,9 +101,15 @@ const columns = [
     </p>
   </div>
 
-  <div class="giant" aria-hidden="true" lang="en">
-    <span>BEENZER</span>
-  </div>
+  {
+    home ? (
+      <CryptoCity />
+    ) : (
+      <div class="giant" aria-hidden="true" lang="en">
+        <span>BEENZER</span>
+      </div>
+    )
+  }
 </footer>
 
 <style>

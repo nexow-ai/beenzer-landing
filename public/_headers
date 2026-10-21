@@ -14,3 +14,5 @@
   Cache-Control: public, max-age=604800
 /globe/*
   Cache-Control: public, max-age=604800
+/city/*
+  Cache-Control: public, max-age=604800

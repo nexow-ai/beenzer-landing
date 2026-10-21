@@ -17,7 +17,7 @@ The website of Beenzer, the geo-social app by [Nexow, Inc.](https://nexow.studio
 
 | Page        | What it does                                                                                                                                                                           |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`         | The scroll dive: a dot-matrix Earth the camera falls onto, down to the shore of Lake Geneva where BEENZER #18 was minted. Then how the app works, on-chain, story, crew, journal, FAQ. |
+| `/`         | The scroll dive: a dot-matrix Earth the camera falls onto, down to the shore of Lake Geneva where BEENZER #18 was minted. Then how the app works, on-chain, story, crew, journal, FAQ, and a night city at the foot of the page. |
 | `/journal/` | News and guides, written in Markdown in `src/content/journal/`.                                                                                                                        |
 | `/legal/`   | Site notice: who runs the site, and what it does with data (nothing: no cookies, analytics or trackers).                                                                               |
 | `/dao/`     | Where the old DAO page sends people now.                                                                                                                                               |
@@ -77,6 +77,8 @@ npm run globe     # Natural Earth land via world-atlas, lakes from scripts/data/
 
 `public/media/` holds the phone clips and the original app walkthrough, re-encoded for the web (H.264, `+faststart`, no audio except the walkthrough). Photos live in `src/assets/` and are resized and converted to WebP at build time.
 
+`public/city/` holds the two layers of buildings in the home page's footer (`src/components/CryptoCity.astro`), drawn for Nexow's Solucky landing and recoloured to this site's tokens. Over them, Solana addresses rain on a canvas at 24 frames a second, stopped off screen and still with reduced motion.
+
 ## Deploy
 
 The build is a static folder. Two ways:
@@ -90,14 +92,14 @@ The build is a static folder. Two ways:
 ```
 src/
   pages/        [...lang]/ (index, journal, legal, dao in every language), 404, [lang]/404
-  components/   Hero, AppTour, Showcase, OnChain, Story, Team, Faq, Follow, Header, Footer, LangSuggest, NotFound, Logo, Icon
+  components/   Hero, AppTour, Showcase, OnChain, Story, Team, Faq, Follow, CryptoCity, Header, Footer, LangSuggest, NotFound, Logo, Icon
   i18n/         locales.ts (the languages), dict/ (their words), index.ts (paths, formats, markup), journal.ts
   scripts/      globe.ts (WebGL), motion.ts (Lenis + GSAP: one clock for the page)
   content/      journal posts (Markdown), one folder per language
   data/         site facts, team, FAQ, globe pins
   lib/          lattice.js (shared with scripts/), icons
   styles/       global.css (tokens, type, controls)
-public/         icons, OG image, globe mask and poster, media, redirects
+public/         icons, OG image, globe mask and poster, city layers, media, redirects
 scripts/        build-globe.mjs
 ```
 

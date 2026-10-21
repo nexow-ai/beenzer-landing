@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `hreflang` alternates in every page and in the sitemap, per-language Open Graph locale and JSON-LD, and a 404 page per language
 - System fonts for Arabic, Hebrew, Devanagari, Thai and CJK scripts, with spacing and line heights set for them
 - The site notice says what the language choice keeps in the browser, and that the English version applies if a translation differs
+- The home page ends in a night city in Beenzer's neon: Solana addresses raining down, the wordmark behind the skyline, posts pinned over the rooftops, and a grid floor running towards the viewer, with two layers of buildings that drift with the mouse
 
 ### Fixed
 

@@ -48,6 +48,14 @@ A rebuild from scratch, for Beenzer as a product of Nexow, Inc. (nexow.studio).
 - Unverified numbers, placeholder sellers and auctions, the defunct Google Play link and the expired Discord and Telegram invites
 - The $BEEN and $BEENZ "invest and earn dividends" copy
 
+## [1.0.6] - 2025-11-05
+
+### Fixed
+
+- Fixed NFT carousel responsive breakpoints to show more cards at all screen sizes
+- Added better granular breakpoints: 6 cards (>1400px), 5 cards (1200-1400px), 4 cards (992-1200px), 3 cards (768-992px), 2 cards (576-768px), 1 card (<576px)
+- Reduced margin between cards from 25px to 15px for better space utilization
+
 ## [1.0.5] - 2025-11-05
 
 ### Changed

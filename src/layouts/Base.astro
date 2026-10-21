@@ -1,0 +1,147 @@
+---
+import '@fontsource-variable/unbounded';
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+import unboundedLatin from '@fontsource-variable/unbounded/files/unbounded-latin-wght-normal.woff2?url';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import LangSuggest from '../components/LangSuggest.astro';
+import { SITE, SOCIAL } from '../data/site';
+import { LOCALES, DEFAULT_LOCALE, localizePath, unlocalizePath, useLocale, type Locale } from '../i18n';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Path under /public, or an absolute URL. */
+  image?: string;
+  type?: 'website' | 'article';
+  published?: string;
+  noindex?: boolean;
+  /** Extra JSON-LD nodes for this page. */
+  schema?: Record<string, unknown>[];
+  /**
+   * The languages this page is really written in, for hreflang. Defaults to
+   * all of them. A page shown in English for want of a translation names the
+   * ones it has, and its canonical points to the English original.
+   */
+  languages?: readonly Locale[];
+}
+
+const { locale, info, lang, dir, t } = useLocale(Astro.url);
+const {
+  title,
+  description = t.meta.description,
+  image = '/og.jpg',
+  type = 'website',
+  published,
+  noindex = false,
+  schema = [],
+  languages = LOCALES.map((l) => l.code),
+} = Astro.props;
+
+// The brand line already says Beenzer, and stays in English in every language;
+// other pages add it after their own title.
+const fullTitle = title ? `${title} · Beenzer` : SITE.tagline.includes(SITE.name) ? SITE.tagline : `Beenzer · ${SITE.tagline}`;
+const page = unlocalizePath(Astro.url.pathname);
+const href = (code: Locale) => new URL(localizePath(page, code), Astro.site).href;
+const canonical = href(languages.includes(locale) ? locale : DEFAULT_LOCALE);
+const alternates = noindex ? [] : LOCALES.filter((l) => languages.includes(l.code));
+const imageUrl = new URL(image, Astro.site).href;
+
+const org = {
+  '@type': 'Organization',
+  '@id': `${SITE.owner.url}/#org`,
+  name: SITE.owner.name,
+  url: SITE.owner.url,
+  logo: `${SITE.owner.url}/logo-black.png`,
+  foundingDate: SITE.owner.incorporated,
+  founder: SITE.owner.founders.map((name) => ({ '@type': 'Person', name })),
+};
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    org,
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE.url}/#site`,
+      name: SITE.name,
+      url: SITE.url,
+      inLanguage: LOCALES.map((l) => l.lang),
+      publisher: { '@id': org['@id'] },
+    },
+    {
+      '@type': 'MobileApplication',
+      '@id': `${SITE.url}/#app`,
+      name: SITE.name,
+      description: t.meta.description,
+      operatingSystem: 'iOS, Android',
+      applicationCategory: 'SocialNetworkingApplication',
+      url: SITE.url,
+      publisher: { '@id': org['@id'] },
+      sameAs: SOCIAL.map((s) => s.href),
+    },
+    ...schema,
+  ],
+};
+---
+
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((l) => <link rel="alternate" hreflang={l.lang} href={href(l.code)} />)}
+    {alternates.length > 0 && <link rel="alternate" hreflang="x-default" href={href(DEFAULT_LOCALE)} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#050506" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="author" content={SITE.owner.name} />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preload" href={unboundedLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={info.og} />
+    {alternates.filter((l) => l.code !== locale).map((l) => <meta property="og:locale:alternate" content={l.og} />)}
+    {published && <meta property="article:published_time" content={published} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={SITE.x} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(graph)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.meta.skip}</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <LangSuggest />
+    <script>
+      import { startMotion } from '../scripts/motion';
+      startMotion();
+    </script>
+  </body>
+</html>

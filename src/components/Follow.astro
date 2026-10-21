@@ -1,0 +1,185 @@
+---
+import Icon from './Icon.astro';
+import { SITE, SOCIAL } from '../data/site';
+import type { IconName } from '../lib/icons';
+import { rich, useLocale } from '../i18n';
+
+const { t } = useLocale(Astro.url);
+const channels = SOCIAL.filter((s) => s.icon !== 'github');
+// A field of pins behind the headline, placed once at build time.
+const pins = Array.from({ length: 26 }, (_, i) => ({
+  x: (i * 37.7) % 100,
+  y: (i * 61.3) % 100,
+  d: (i * 0.37) % 4,
+  s: 0.6 + ((i * 7) % 5) * 0.12,
+}));
+---
+
+<section class="follow" id="follow" aria-labelledby="follow-title" data-anim>
+  <div class="field" aria-hidden="true">
+    {pins.map((p) => <i style={`left:${p.x}%;top:${p.y}%;--d:${p.d}s;--s:${p.s}`} />)}
+  </div>
+  <div class="container inner">
+    <p class="chip" data-reveal>
+      <span class="live-dot" aria-hidden="true"></span>
+      {t.follow.chip}
+    </p>
+    <h2 class="display title" id="follow-title" data-split set:html={rich(t.follow.title)} />
+    <p class="lead" data-reveal>{t.follow.lead}</p>
+
+    <div class="platforms" data-reveal>
+      <span class="platform"><Icon name="brand-apple" size={20} /> iOS <em class="mono">{t.follow.status}</em></span>
+      <span class="platform"><Icon name="brand-android" size={20} /> Android <em class="mono">{t.follow.status}</em></span>
+    </div>
+
+    <ul class="channels" role="list">
+      {
+        channels.map((c) => (
+          <li data-reveal>
+            <a href={c.href} target="_blank" rel="noopener">
+              <Icon name={`brand-${c.icon}` as IconName} size={22} />
+              <span>
+                <b>{c.label}</b>
+                <span class="mono">{c.handle}</span>
+              </span>
+              <Icon name="arrow-up-right" size={18} class="go" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="press body" data-reveal set:html={rich(t.follow.press, { contact: SITE.owner.contact })} />
+  </div>
+</section>
+
+<style>
+  .follow {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(120px, 16vw, 220px);
+    border-top: 1px solid var(--line);
+    background:
+      radial-gradient(70% 60% at 50% 100%, rgb(22 253 130 / 0.14), transparent 70%),
+      radial-gradient(50% 40% at 15% 0%, rgb(19 152 185 / 0.12), transparent 70%),
+      var(--bg);
+  }
+  .field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mask-image: radial-gradient(70% 70% at 50% 50%, transparent 30%, #000 80%);
+  }
+  .field i {
+    position: absolute;
+    width: calc(10px * var(--s));
+    height: calc(10px * var(--s));
+    border-radius: 50%;
+    background: var(--neon);
+    box-shadow: 0 0 18px var(--neon);
+    opacity: 0.5;
+    animation: float 6s ease-in-out infinite;
+    animation-delay: calc(var(--d) * -1);
+  }
+  .field i::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1px solid rgb(22 253 130 / 0.5);
+    animation: ping 3s var(--ease-out) infinite;
+    animation-delay: var(--d);
+  }
+  @keyframes float {
+    50% {
+      transform: translateY(-14px);
+    }
+  }
+  .inner {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 28px;
+    text-align: center;
+  }
+  .title {
+    max-width: 12ch;
+    font-size: clamp(2.75rem, 8.6vw, 8.75rem);
+  }
+  .inner .lead {
+    max-width: 40ch;
+  }
+  .platforms {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .platform {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-weight: 600;
+  }
+  .platform em {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--neon);
+  }
+  .channels {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    width: min(100%, 860px);
+    margin-top: 12px;
+  }
+  .channels a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 76px;
+    padding: 0 20px;
+    border-radius: var(--radius);
+    text-align: start;
+    background: rgb(255 255 255 / 0.03);
+    box-shadow: inset 0 0 0 1px var(--line);
+    transition:
+      background-color 0.3s,
+      box-shadow 0.3s,
+      transform 0.5s var(--ease-out);
+  }
+  .channels a:hover {
+    background: var(--neon);
+    color: #00180b;
+    transform: translateY(-3px);
+    box-shadow: 0 20px 50px -20px rgb(22 253 130 / 0.7);
+  }
+  .channels a > span {
+    display: grid;
+    line-height: 1.25;
+  }
+  .channels .mono {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+  .channels :global(.go) {
+    margin-inline-start: auto;
+  }
+  .press {
+    margin-top: 8px;
+    font-size: 0.95rem;
+  }
+  @media (max-width: 720px) {
+    .channels {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

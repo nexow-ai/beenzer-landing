@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../data/site';
+import { localeParams, rich, useLocale, type Locale } from '../../i18n';
+
+export const getStaticPaths = localeParams;
+
+const { locale } = Astro.props as { locale: Locale };
+const { t, fill, date } = useLocale(locale);
+const updated = '2026-10-21';
+const long = (iso: string) => date(new Date(`${iso}T00:00:00Z`), { day: 'numeric', month: 'long', year: 'numeric' });
+const values = { company: SITE.owner.name, incorporated: long(SITE.owner.incorporated) };
+const links = { legal: SITE.owner.legal, contact: SITE.owner.contact };
+const [before, after = ''] = t.legal.updated.split('{date}');
+---
+
+<Base title={t.legal.title} description={t.legal.description}>
+  <section class="page container">
+    <header class="head">
+      <p class="eyebrow">{t.legal.eyebrow}</p>
+      <h1 class="display">{t.legal.heading}</h1>
+      <p class="mono updated">{before}<time datetime={updated}>{long(updated)}</time>{after}</p>
+    </header>
+
+    <div class="prose">
+      {
+        t.legal.sections.map((section) => (
+          <>
+            <h2>{section.title}</h2>
+            {section.body.map((p) => (
+              <p set:html={rich(fill(p, values), links, { linkClass: '' })} />
+            ))}
+          </>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page {
+    padding-top: calc(var(--header-h) + clamp(64px, 10vw, 140px));
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .head {
+    display: grid;
+    gap: 22px;
+    margin-bottom: clamp(48px, 7vw, 88px);
+  }
+  .head .display {
+    font-size: clamp(2.6rem, 6.4vw, 6.5rem);
+  }
+  .updated {
+    font-size: 0.78rem;
+    color: var(--text-3);
+  }
+  .prose {
+    max-width: 44rem;
+    color: var(--text-2);
+    font-size: 1.1rem;
+    line-height: 1.75;
+  }
+  .prose > * + * {
+    margin-top: 1.1em;
+  }
+  .prose h2 {
+    margin-top: 2em;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .prose :global(strong) {
+    color: var(--text);
+  }
+  .prose :global(a) {
+    color: var(--neon);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

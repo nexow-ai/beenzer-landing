@@ -1,0 +1,1337 @@
+---
+/**
+ * How it works: a phone running the app, built in HTML so it stays sharp,
+ * light and live. The screens follow the Flutter rebuild (FLUTTER_MIGRATION.md
+ * in nexow-ai/beenzer): zinc surfaces, green accent, a floating glass dock
+ * with Create in the middle, Phantom for signing.
+ *
+ * Desktop: the steps scroll, the phone stays. Phone-sized screens: the steps
+ * become a row you swipe, under the phone.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import van from '../assets/posts/van.jpg';
+import friends from '../assets/posts/friends.jpg';
+import selfie from '../assets/posts/selfie.jpg';
+import lights from '../assets/posts/lights.jpg';
+import crew from '../assets/posts/crew.jpg';
+import portrait from '../assets/posts/portrait.jpg';
+import duo from '../assets/posts/duo.jpg';
+import { useLocale } from '../i18n';
+
+const { t, unit, number } = useLocale(Astro.url);
+const phone = t.tour.phone;
+const places = t.places;
+const km = (n: number) => unit(n, 'kilometer');
+// "Within {distance}": the words around the live distance, in the language's order.
+const within = phone.within.split('{distance}') as [string, string?];
+
+// The steps' words are in the dictionary (tour.steps), in this order.
+const steps = (['map', 'snap', 'pin', 'share', 'mint'] as const).map((id, i) => ({
+  id,
+  n: String(i).padStart(2, '0'),
+  ...t.tour.steps[i],
+}));
+
+const mapPins = [
+  { img: van, x: 22, y: 30, d: 0 },
+  { img: friends, x: 64, y: 22, d: 1 },
+  { img: selfie, x: 48, y: 46, d: 2, hot: true },
+  { img: lights, x: 78, y: 52, d: 3 },
+  { img: crew, x: 30, y: 62, d: 4 },
+];
+---
+
+<section class="tour section" id="how" aria-labelledby="how-title" data-tour>
+  <div class="container head">
+    <p class="eyebrow" data-reveal>{t.tour.eyebrow}</p>
+    <h2 class="h2" id="how-title" data-split>{t.tour.title}</h2>
+  </div>
+
+  <div class="container layout">
+    <ol class="steps" role="list" data-steps>
+      {
+        steps.map((step, i) => (
+          <li class="step" data-step={step.id} data-index={i} aria-current={i === 0 ? 'step' : undefined}>
+            <div class="step-card">
+              <p class="step-n mono">
+                <span>{step.n}</span>/04
+              </p>
+              <h3 class="h3">{step.title}</h3>
+              <p class="body">{step.body}</p>
+              {step.id === 'pin' && (
+                <label class="try">
+                  <span class="mono">{t.tour.try}</span>
+                  <input type="range" min="1" max="100" value="24" data-radius-input aria-label={t.tour.radius} />
+                  <output class="mono" data-radius-out>
+                    {km(24)}
+                  </output>
+                </label>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="device-wrap">
+      <div class="device" data-device data-screen="map" data-anim aria-hidden="true">
+        <div class="phone">
+          <div class="island"></div>
+          <div class="screen">
+            <div class="statusbar mono"><span>13:41</span><span class="sb-icons"><i></i><i></i><i></i></span></div>
+
+            <!-- 00 · map -->
+            <div class="scr scr-map" data-scr="map">
+              <div class="topbar">
+                <div>
+                  <b class="wordmark">BEENZER</b>
+                  <span class="place">{places.savigny}</span>
+                </div>
+                <span class="round"><Icon name="search" size={16} /></span>
+                <span class="round badge"><Icon name="bell" size={16} /></span>
+              </div>
+              <svg class="map" viewBox="0 0 300 560" preserveAspectRatio="xMidYMid slice">
+                <rect width="300" height="560" fill="#1c1c20"></rect>
+                <path d="M-10 420 C 60 395 120 430 180 418 S 290 380 320 392 V 600 H -10 Z" fill="#14243a"></path>
+                <path d="M30 120 q40 -30 80 0 t60 40 q-20 40 -70 30 t-70 -70z" fill="#1d3123"></path>
+                <path d="M210 250 q30 -20 55 5 t-5 55 q-40 10 -55 -20 t5 -40z" fill="#1d3123"></path>
+                <g fill="none" stroke="#34343b" stroke-linecap="round">
+                  <path d="M-10 300 C 80 280 160 330 320 280" stroke-width="7"></path>
+                  <path d="M150 -10 C 140 120 170 220 140 420" stroke-width="6"></path>
+                  <path d="M-10 180 C 90 200 200 160 320 190" stroke-width="4"></path>
+                </g>
+                <g fill="none" stroke="#28282e" stroke-width="2">
+                  <path d="M40 0 L 60 400"></path><path d="M90 0 L 100 410"></path><path d="M210 0 L 230 400"></path>
+                  <path d="M260 0 L 270 390"></path><path d="M0 60 L 300 80"></path><path d="M0 240 L 300 230"></path>
+                  <path d="M0 360 L 300 350"></path><path d="M0 130 L 300 120"></path>
+                </g>
+              </svg>
+              <span class="me" style="left:56%;top:58%"></span>
+              {
+                mapPins.map((pin) => (
+                  <span class:list={['mpin', { hot: pin.hot }]} style={`left:${pin.x}%;top:${pin.y}%;--d:${pin.d}`}>
+                    <Image src={pin.img} alt="" width={72} height={72} loading="lazy" />
+                  </span>
+                ))
+              }
+              <div class="peek">
+                <Image src={selfie} alt="" width={96} height={96} loading="lazy" class="peek-img" />
+                <div>
+                  <b>@mara</b>
+                  <span class="mono">{places.lutry} · {unit(2, 'hour', 'narrow')} · {km(1.4)}</span>
+                  <span class="peek-likes">
+                    <Icon name="heart" size={12} /> 128 <Icon name="message-circle" size={12} /> 14
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 01 · camera -->
+            <div class="scr scr-snap" data-scr="snap">
+              <video
+                class="cam-video"
+                muted
+                loop
+                playsinline
+                preload="none"
+                data-poster="/media/camera.webp"
+                data-src="/media/camera.mp4"></video>
+              <div class="cam-top">
+                <span class="round dark"><Icon name="x" size={16} /></span>
+                <span class="rec mono"><i></i> 00:04</span>
+                <span class="round dark"><Icon name="zap" size={16} /></span>
+              </div>
+              <div class="cam-bottom">
+                <div class="modes mono"><span>{phone.audio}</span><span>{phone.photo}</span><b>{phone.video}</b></div>
+                <div class="shutter-row">
+                  <span class="gallery"><Image src={duo} alt="" width={64} height={64} loading="lazy" /></span>
+                  <span class="shutter"><i></i></span>
+                  <span class="round dark"><Icon name="flip-horizontal-2" size={18} /></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 02 · pin -->
+            <div class="scr scr-pin" data-scr="pin">
+              <div class="bar"><Icon name="arrow-right" size={18} class="back" /><b>{phone.newPost}</b><span></span></div>
+              <div class="draft">
+                <img src="/media/camera.webp" alt="" width="64" height="112" loading="lazy" decoding="async" />
+                <div>
+                  <p>{phone.caption}</p>
+                  <span class="chip-s mono"
+                    ><Icon name="map-pin" size={11} /> {places.savigny} · <bdi>46.54° N 6.72° E</bdi></span
+                  >
+                </div>
+              </div>
+              <div class="radius-map">
+                <svg viewBox="0 0 260 150" preserveAspectRatio="xMidYMid slice">
+                  <rect width="260" height="150" fill="#1c1c20"></rect>
+                  <path d="M-10 118 C 50 100 110 128 170 116 S 250 92 270 98 V 160 H -10 Z" fill="#14243a"></path>
+                  <g fill="none" stroke="#34343b" stroke-width="3"><path d="M-10 80 C 80 66 160 96 270 70"></path><path
+                      d="M130 -10 C 124 50 140 90 124 160"></path></g>
+                  <circle cx="130" cy="78" r="38" class="radius" data-radius-circle></circle>
+                  <circle cx="130" cy="78" r="4.5" fill="#16fd82"></circle>
+                </svg>
+                <span class="radius-label mono" data-radius-label>{km(24)}</span>
+              </div>
+              <div class="field">
+                <span class="label mono">{phone.who}</span>
+                <div class="seg"><span>{phone.everyone}</span><b>{phone.nearby}</b></div>
+              </div>
+              <div class="field">
+                <span class="label mono"
+                  >{within[0]}<span data-radius-text>{km(24)}</span>{within[1]}</span
+                >
+                <span class="slider"><i data-radius-fill style="--v:0.24"></i></span>
+              </div>
+              <div class="field row">
+                <span>{phone.editions}</span>
+                <span class="stepper mono"><i>−</i><b>20</b><i>+</i></span>
+              </div>
+              <span class="cta-btn">{phone.drop}</span>
+            </div>
+
+            <!-- 03 · share -->
+            <div class="scr scr-share" data-scr="share">
+              <div class="bar"><b class="wordmark">BEENZER</b><span class="round"><Icon name="bell" size={15} /></span></div>
+              <div class="seg wide"><b>{phone.friends}</b><span>{phone.public}</span></div>
+              <div class="feed">
+                <article class="post">
+                  <header>
+                    <Image src={portrait} alt="" width={48} height={48} loading="lazy" class="av" />
+                    <div><b>@jonas</b><span class="mono">{places.lausanne} · {unit(12, 'minute', 'narrow')}</span></div>
+                  </header>
+                  <video
+                    muted
+                    loop
+                    playsinline
+                    preload="none"
+                    data-poster="/media/feed-party.webp"
+                    data-src="/media/feed-party.mp4"></video>
+                  <footer>
+                    <span><Icon name="heart" size={14} /> 86</span>
+                    <span><Icon name="message-circle" size={14} /> 9</span>
+                    <span><Icon name="share-2" size={14} /></span>
+                    <span class="mono km">{km(2.1)}</span>
+                  </footer>
+                </article>
+                <article class="post">
+                  <header>
+                    <Image src={friends} alt="" width={48} height={48} loading="lazy" class="av" />
+                    <div><b>@lea</b><span class="mono">{places.vevey} · {unit(1, 'hour', 'narrow')}</span></div>
+                  </header>
+                  <video
+                    muted
+                    loop
+                    playsinline
+                    preload="none"
+                    data-poster="/media/feed-guitar.webp"
+                    data-src="/media/feed-guitar.mp4"></video>
+                </article>
+              </div>
+              <div class="toast">
+                <Image src={portrait} alt="" width={40} height={40} loading="lazy" class="av" />
+                <div><b>Jonas</b><span>{phone.message}</span></div>
+              </div>
+            </div>
+
+            <!-- 04 · mint -->
+            <div class="scr scr-mint" data-scr="mint">
+              <div class="sheet">
+                <span class="grabber"></span>
+                <b class="sheet-title">{phone.mint}</b>
+                <div class="sheet-rows mono">
+                  <div><span>{phone.editions}</span><b>20</b></div>
+                  <div><span>{phone.price}</span><b>{number(0.1)} SOL</b></div>
+                  <div><span>{phone.royalties}</span><b>{number(0.1, { style: 'percent' })}</b></div>
+                </div>
+                <span class="phantom"><Icon name="wallet" size={15} /> {phone.approve}</span>
+                <ol class="logs mono" role="list">
+                  {
+                    phone.logs.map((log, i) => (
+                      <li style={`--i:${i}`}>
+                        <i />
+                        {log}
+                      </li>
+                    ))
+                  }
+                </ol>
+              </div>
+            </div>
+
+            <nav class="dock" data-dock>
+              <i class="on"><Icon name="map" size={16} /></i>
+              <i><Icon name="users" size={16} /></i>
+              <i class="create"><Icon name="plus" size={20} /></i>
+              <i><Icon name="message-circle" size={16} /></i>
+              <i class="avatar"><Image src={selfie} alt="" width={40} height={40} loading="lazy" /></i>
+            </nav>
+          </div>
+        </div>
+        <div class="device-glow"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tour {
+    --phone-w: min(330px, 34vh);
+  }
+  .head {
+    display: grid;
+    gap: 20px;
+    max-width: calc(var(--max) + var(--gutter) * 2);
+  }
+  .head .h2 {
+    max-width: 16ch;
+  }
+  .layout {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 48px;
+    margin-top: clamp(32px, 6vw, 80px);
+  }
+
+  /* ---------- steps ---------- */
+  .steps {
+    display: grid;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .step {
+    min-height: 82vh;
+    display: flex;
+    align-items: center;
+  }
+  .step:first-child {
+    min-height: 62vh;
+  }
+  /* Room below the last step, so the phone stays put while it is read. */
+  .step:last-child {
+    min-height: 100vh;
+  }
+  /* Inactive steps recede in colour, not in opacity, so they stay readable. */
+  .step-card {
+    display: grid;
+    gap: 16px;
+    max-width: 30rem;
+    color: var(--text-3);
+    transition: color 0.6s var(--ease-out);
+  }
+  .step-card .body,
+  .step-card .h3 {
+    color: inherit;
+    transition: color 0.6s var(--ease-out);
+  }
+  .step[aria-current] .step-card .h3 {
+    color: var(--text);
+  }
+  .step[aria-current] .step-card .body {
+    color: var(--text-2);
+  }
+  .step-n {
+    font-size: 0.8rem;
+    color: var(--text-3);
+  }
+  .step-n span {
+    color: var(--neon);
+  }
+  .step .h3 {
+    font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  }
+  .step .body {
+    font-size: 1.1rem;
+  }
+  .try {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px 16px;
+    margin-top: 8px;
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.03);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .try > .mono {
+    grid-column: 1 / -1;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .try input {
+    width: 100%;
+    accent-color: var(--neon);
+    height: 28px;
+  }
+  .try output {
+    min-width: 4.5em;
+    text-align: end;
+    color: var(--neon);
+  }
+
+  /* ---------- device ---------- */
+  .device-wrap {
+    position: relative;
+  }
+  .device {
+    position: sticky;
+    top: calc(50vh - var(--phone-w) * 1.05);
+    display: grid;
+    place-items: center;
+    padding-block: 24px;
+  }
+  .device-glow {
+    position: absolute;
+    inset: 15% 10%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgb(22 253 130 / 0.22), transparent);
+    filter: blur(40px);
+  }
+  .phone {
+    position: relative;
+    width: var(--phone-w);
+    aspect-ratio: 9 / 19.5;
+    padding: 2.8%;
+    border-radius: 15% / 7%;
+    background: linear-gradient(145deg, #2a2a30, #0c0c0e 40%, #1d1d22);
+    box-shadow:
+      inset 0 0 0 1.5px rgb(255 255 255 / 0.12),
+      inset 0 0 0 5px #0a0a0b,
+      0 40px 100px -30px rgb(0 0 0 / 0.9),
+      0 0 0 1px rgb(0 0 0 / 0.6);
+    transform: perspective(1400px) rotateY(-8deg) rotateX(4deg);
+    transition: transform 1.2s var(--ease-out);
+    /* The screen's type and spacing scale with the phone. */
+    container-type: inline-size;
+  }
+  .device:hover .phone {
+    transform: perspective(1400px) rotateY(0) rotateX(0);
+  }
+  .island {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    top: 3.6%;
+    width: 30%;
+    height: 3.6%;
+    translate: -50% 0;
+    border-radius: 99px;
+    background: #000;
+  }
+  .screen {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 12.5% / 5.8%;
+    background: #18181b;
+    font-size: 3.6cqw;
+    color: #fff;
+    font-family: var(--font-body);
+  }
+  .screen :global(svg.icon) {
+    width: 1.5em;
+    height: 1.5em;
+  }
+  .statusbar {
+    position: absolute;
+    z-index: 4;
+    inset: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    padding: 4.2% 9% 0;
+    font-size: 0.95em;
+    font-weight: 600;
+  }
+  .sb-icons {
+    display: flex;
+    gap: 0.35em;
+    align-items: center;
+  }
+  .sb-icons i {
+    display: block;
+    width: 1.1em;
+    height: 0.7em;
+    border-radius: 0.2em;
+    background: #fff;
+    opacity: 0.9;
+  }
+  .sb-icons i:last-child {
+    width: 1.8em;
+  }
+
+  .scr {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.04);
+    transition:
+      opacity 0.55s var(--ease-out),
+      transform 0.8s var(--ease-out),
+      visibility 0s 0.55s;
+  }
+  [data-screen='map'] .scr-map,
+  [data-screen='snap'] .scr-snap,
+  [data-screen='pin'] .scr-pin,
+  [data-screen='share'] .scr-share,
+  [data-screen='mint'] .scr-mint,
+  [data-screen='mint'] .scr-pin {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 0.55s var(--ease-out),
+      transform 0.8s var(--ease-out),
+      visibility 0s;
+  }
+
+  .round {
+    display: grid;
+    place-items: center;
+    width: 2.6em;
+    height: 2.6em;
+    border-radius: 50%;
+    background: rgb(39 39 42 / 0.9);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+  .round.dark {
+    background: rgb(0 0 0 / 0.4);
+    backdrop-filter: blur(8px);
+  }
+  .badge {
+    position: relative;
+  }
+  .badge::after {
+    content: '';
+    position: absolute;
+    top: 0.45em;
+    inset-inline-end: 0.5em;
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 2px #27272a;
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35em;
+    letter-spacing: -0.02em;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* map */
+  .topbar {
+    position: absolute;
+    z-index: 3;
+    inset: 13% 6% auto;
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+  .topbar > div {
+    display: grid;
+    margin-inline-end: auto;
+    line-height: 1.15;
+  }
+  .place {
+    font-size: 0.85em;
+    color: #a1a1aa;
+  }
+  .map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .me {
+    position: absolute;
+    width: 1em;
+    height: 1em;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: #3b82f6;
+    box-shadow:
+      0 0 0 0.25em rgb(255 255 255 / 0.9),
+      0 0 0 0.9em rgb(59 130 246 / 0.25);
+  }
+  .mpin {
+    position: absolute;
+    width: 3.4em;
+    height: 3.4em;
+    translate: -50% -100%;
+    padding: 0.2em;
+    border-radius: 50% 50% 50% 0.3em;
+    rotate: -45deg;
+    background: #22c55e;
+    box-shadow: 0 0.6em 1.4em rgb(0 0 0 / 0.5);
+    opacity: 0;
+  }
+  .mpin :global(img) {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    rotate: 45deg;
+  }
+  .mpin.hot {
+    width: 4.4em;
+    height: 4.4em;
+    background: var(--neon);
+    box-shadow:
+      0 0 2em rgb(22 253 130 / 0.6),
+      0 0.6em 1.4em rgb(0 0 0 / 0.5);
+  }
+  [data-screen='map'] .mpin {
+    animation: drop 0.9s var(--ease-out) both;
+    animation-delay: calc(0.25s + var(--d) * 0.12s);
+  }
+  @keyframes drop {
+    from {
+      opacity: 0;
+      transform: translate(-1.2em, -1.2em);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .peek {
+    position: absolute;
+    z-index: 3;
+    inset: auto 5% 17%;
+    display: flex;
+    gap: 0.8em;
+    align-items: center;
+    padding: 0.7em;
+    border-radius: 1.4em;
+    background: rgb(24 24 27 / 0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    transform: translateY(140%);
+    transition: transform 0.8s var(--ease-out) 0.9s;
+  }
+  [data-screen='map'] .peek {
+    transform: none;
+  }
+  .peek :global(.peek-img) {
+    width: 3.6em;
+    height: 3.6em;
+    border-radius: 0.9em;
+    object-fit: cover;
+  }
+  .peek div {
+    display: grid;
+    gap: 0.15em;
+    line-height: 1.2;
+  }
+  .peek .mono {
+    font-size: 0.8em;
+    color: #a1a1aa;
+  }
+  .peek-likes {
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    font-size: 0.85em;
+    color: #a1a1aa;
+  }
+  .peek-likes :global(svg.icon) {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  /* dock */
+  .dock {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    bottom: 4%;
+    translate: -50% 0;
+    display: flex;
+    gap: 0.45em;
+    padding: 0.45em;
+    border-radius: 99px;
+    background: rgb(39 39 42 / 0.72);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.1),
+      0 1.2em 2.4em rgb(0 0 0 / 0.5);
+    transition:
+      opacity 0.4s,
+      transform 0.6s var(--ease-out);
+  }
+  [data-screen='snap'] .dock,
+  [data-screen='pin'] .dock,
+  [data-screen='mint'] .dock {
+    opacity: 0;
+    transform: translateY(150%);
+  }
+  .dock i {
+    display: grid;
+    place-items: center;
+    width: 2.6em;
+    height: 2.6em;
+    border-radius: 50%;
+    color: #d4d4d8;
+    font-style: normal;
+  }
+  .dock i.on {
+    background: #22c55e;
+    color: #fff;
+  }
+  [data-screen='share'] .dock i.on {
+    background: none;
+    color: #d4d4d8;
+  }
+  [data-screen='share'] .dock i:nth-child(2) {
+    background: #22c55e;
+    color: #fff;
+  }
+  .dock i.create {
+    width: 3.2em;
+    height: 2.6em;
+    border-radius: 99px;
+    background: linear-gradient(120deg, var(--teal), var(--neon));
+    color: #00180b;
+  }
+  .dock i.avatar :global(img) {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px #52525b;
+  }
+
+  /* camera */
+  .scr-snap {
+    background: #000;
+  }
+  .cam-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cam-top {
+    position: absolute;
+    inset: 13% 6% auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .rec {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.35em 0.8em;
+    border-radius: 99px;
+    background: rgb(220 38 38 / 0.9);
+    font-size: 0.85em;
+  }
+  .rec i {
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: #fff;
+  }
+  [data-screen='snap'] .rec i {
+    animation: blink 1s steps(2) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .cam-bottom {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 1.2em;
+    padding: 2em 8% 10%;
+    background: linear-gradient(0deg, rgb(0 0 0 / 0.75), transparent);
+  }
+  .modes {
+    display: flex;
+    justify-content: center;
+    gap: 1.4em;
+    font-size: 0.8em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.6);
+  }
+  .modes b {
+    color: #fde047;
+    font-weight: 600;
+  }
+  .shutter-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .gallery :global(img) {
+    width: 2.8em;
+    height: 2.8em;
+    border-radius: 0.6em;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px #fff;
+  }
+  .shutter {
+    display: grid;
+    place-items: center;
+    width: 5em;
+    height: 5em;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 0.35em #fff;
+  }
+  .shutter i {
+    width: 2em;
+    height: 2em;
+    border-radius: 0.5em;
+    background: #dc2626;
+  }
+  [data-screen='snap'] .shutter i {
+    animation: breathe 1.4s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    50% {
+      transform: scale(0.85);
+    }
+  }
+
+  /* pin */
+  .scr-pin {
+    padding: 13% 6% 0;
+    display: grid;
+    align-content: start;
+    gap: 0.9em;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.6em;
+  }
+  .bar b {
+    font-weight: 600;
+  }
+  .bar :global(.back) {
+    rotate: 180deg;
+  }
+  .bar > span:empty {
+    width: 1.5em;
+  }
+  .draft {
+    display: flex;
+    gap: 0.8em;
+    align-items: center;
+    padding: 0.6em;
+    border-radius: 1.1em;
+    background: #27272a;
+  }
+  .draft img {
+    width: 3.2em;
+    height: 4.8em;
+    border-radius: 0.6em;
+    object-fit: cover;
+  }
+  .draft div {
+    display: grid;
+    gap: 0.4em;
+  }
+  .draft p {
+    font-weight: 500;
+  }
+  .chip-s {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    font-size: 0.72em;
+    color: #22c55e;
+  }
+  .chip-s :global(svg.icon) {
+    width: 1.1em;
+    height: 1.1em;
+  }
+  .radius-map {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.1em;
+    aspect-ratio: 26 / 15;
+  }
+  .radius-map svg {
+    width: 100%;
+    height: 100%;
+  }
+  .radius {
+    fill: rgb(34 197 94 / 0.18);
+    stroke: #22c55e;
+    stroke-width: 1.5;
+    transition: r 0.35s var(--ease-out);
+  }
+  .radius-label {
+    position: absolute;
+    inset-inline-end: 0.6em;
+    top: 0.6em;
+    padding: 0.2em 0.6em;
+    border-radius: 99px;
+    background: rgb(0 0 0 / 0.6);
+    font-size: 0.75em;
+  }
+  .field {
+    display: grid;
+    gap: 0.5em;
+  }
+  .field.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7em 0.9em;
+    border-radius: 1em;
+    background: #27272a;
+    font-weight: 500;
+  }
+  .label {
+    font-size: 0.72em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #a1a1aa;
+  }
+  .seg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0.25em;
+    border-radius: 99px;
+    background: #27272a;
+    font-size: 0.9em;
+    text-align: center;
+  }
+  .seg > * {
+    padding: 0.45em 0;
+    border-radius: 99px;
+    color: #a1a1aa;
+  }
+  .seg b {
+    background: #3f3f46;
+    color: #fff;
+    font-weight: 600;
+  }
+  .seg.wide {
+    margin: 0 6%;
+  }
+  .slider {
+    position: relative;
+    height: 0.4em;
+    border-radius: 99px;
+    background: #3f3f46;
+  }
+  .slider i {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: calc(var(--v) * 100%);
+    border-radius: inherit;
+    background: #22c55e;
+    transition: width 0.35s var(--ease-out);
+  }
+  .slider i::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: -0.7em;
+    top: 50%;
+    width: 1.4em;
+    height: 1.4em;
+    translate: 0 -50%;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0.2em 0.6em rgb(0 0 0 / 0.4);
+  }
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7em;
+  }
+  .stepper i {
+    display: grid;
+    place-items: center;
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 50%;
+    background: #3f3f46;
+    font-style: normal;
+  }
+  .stepper b {
+    min-width: 1.6em;
+    text-align: center;
+    color: #22c55e;
+  }
+  .cta-btn {
+    display: grid;
+    place-items: center;
+    min-height: 3.2em;
+    margin-top: 0.2em;
+    border-radius: 99px;
+    background: #22c55e;
+    font-weight: 600;
+  }
+
+  /* share */
+  .scr-share {
+    padding-top: 12%;
+    display: grid;
+    align-content: start;
+    gap: 0.8em;
+  }
+  .scr-share > .bar {
+    padding: 0 6%;
+  }
+  .feed {
+    display: grid;
+    gap: 0.9em;
+    padding: 0 5%;
+  }
+  .post {
+    overflow: hidden;
+    border-radius: 1.3em;
+    background: #27272a;
+  }
+  .post header {
+    display: flex;
+    gap: 0.6em;
+    align-items: center;
+    padding: 0.65em 0.8em;
+  }
+  .post header div {
+    display: grid;
+    line-height: 1.2;
+  }
+  .post header .mono {
+    font-size: 0.75em;
+    color: #a1a1aa;
+  }
+  .screen :global(.av) {
+    width: 2.2em;
+    height: 2.2em;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .post video {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    background: #111;
+  }
+  .post footer {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    padding: 0.7em 0.9em;
+    font-size: 0.85em;
+  }
+  .post footer span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+  }
+  .post footer .km {
+    margin-inline-start: auto;
+    color: #22c55e;
+  }
+  .toast {
+    position: absolute;
+    z-index: 5;
+    inset: 11% 4% auto;
+    display: flex;
+    gap: 0.6em;
+    align-items: center;
+    padding: 0.6em 0.8em;
+    border-radius: 1.2em;
+    background: rgb(39 39 42 / 0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1em 2em rgb(0 0 0 / 0.5);
+    transform: translateY(-160%);
+    transition: transform 0.7s var(--ease-out);
+  }
+  [data-screen='share'] .toast {
+    animation: toast 5s var(--ease-out) 1.2s both;
+  }
+  @keyframes toast {
+    0% {
+      transform: translateY(-160%);
+    }
+    12%,
+    80% {
+      transform: none;
+    }
+    100% {
+      transform: translateY(-160%);
+    }
+  }
+  .toast div {
+    display: grid;
+    line-height: 1.25;
+    font-size: 0.9em;
+  }
+  .toast span {
+    color: #d4d4d8;
+  }
+
+  /* mint */
+  .scr-mint {
+    z-index: 2;
+    background: rgb(0 0 0 / 0.5);
+  }
+  .sheet {
+    position: absolute;
+    inset: auto 0 0;
+    display: grid;
+    gap: 0.9em;
+    padding: 0.8em 6% 12%;
+    border-radius: 1.8em 1.8em 0 0;
+    background: #18181b;
+    box-shadow: 0 -1px 0 rgb(255 255 255 / 0.1);
+    transform: translateY(100%);
+    transition: transform 0.8s var(--ease-out);
+  }
+  [data-screen='mint'] .sheet {
+    transform: none;
+  }
+  .grabber {
+    justify-self: center;
+    width: 3em;
+    height: 0.3em;
+    border-radius: 99px;
+    background: #52525b;
+  }
+  .sheet-title {
+    font-family: var(--font-display);
+    font-size: 1.2em;
+    letter-spacing: -0.02em;
+  }
+  .sheet-rows {
+    display: grid;
+    gap: 0.5em;
+    font-size: 0.85em;
+  }
+  .sheet-rows div {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid #27272a;
+  }
+  .sheet-rows span {
+    color: #a1a1aa;
+  }
+  .phantom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em;
+    min-height: 3em;
+    border-radius: 99px;
+    background: #ab9ff2;
+    color: #1c1236;
+    font-weight: 600;
+  }
+  .logs {
+    display: grid;
+    gap: 0.55em;
+    padding: 0;
+    margin: 0.2em 0 0;
+    list-style: none;
+    font-size: 0.78em;
+    color: #a1a1aa;
+  }
+  .logs li {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    opacity: 0.35;
+  }
+  .logs i {
+    width: 1.1em;
+    height: 1.1em;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px #52525b;
+  }
+  [data-screen='mint'] .logs li {
+    animation: log 0.01s linear both;
+    animation-delay: calc(1.4s + var(--i) * 0.9s);
+  }
+  [data-screen='mint'] .logs i {
+    animation: tick 0.01s linear both;
+    animation-delay: calc(1.4s + var(--i) * 0.9s);
+  }
+  @keyframes log {
+    to {
+      opacity: 1;
+      color: #fff;
+    }
+  }
+  @keyframes tick {
+    to {
+      background: #22c55e;
+      box-shadow: inset 0 0 0 0.3em #22c55e;
+    }
+  }
+
+  /* ---------- small screens: phone on top, steps in a swipeable row ---------- */
+  @media (max-width: 900px) {
+    .tour {
+      --phone-w: min(250px, 58vw, 29svh);
+    }
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+    .device-wrap {
+      order: -1;
+    }
+    .device {
+      position: relative;
+      top: 0;
+    }
+    .phone {
+      transform: none;
+    }
+    .steps {
+      grid-auto-flow: column;
+      grid-auto-columns: 86%;
+      gap: 12px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      margin-inline: calc(var(--gutter) * -1);
+      padding: 4px var(--gutter) 12px;
+      scroll-padding-inline: var(--gutter);
+    }
+    .steps::-webkit-scrollbar {
+      display: none;
+    }
+    .step,
+    .step:first-child,
+    .step:last-child {
+      display: block;
+      min-height: 0;
+      scroll-snap-align: start;
+    }
+    .step-card {
+      align-content: start;
+      max-width: none;
+      height: 100%;
+      padding: 22px;
+      border-radius: var(--radius);
+      background: rgb(255 255 255 / 0.03);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+    .step[aria-current] .step-card {
+      box-shadow: inset 0 0 0 1px rgb(22 253 130 / 0.35);
+    }
+    .step .h3 {
+      font-size: 1.5rem;
+    }
+    .step .body {
+      font-size: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .phone {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const tour = document.querySelector<HTMLElement>('[data-tour]');
+  const device = tour?.querySelector<HTMLElement>('[data-device]');
+  const stepsList = tour?.querySelector<HTMLElement>('[data-steps]');
+
+  if (tour && device && stepsList) {
+    const steps = [...stepsList.querySelectorAll<HTMLElement>('[data-step]')];
+    const videos = [...device.querySelectorAll<HTMLVideoElement>('video[data-src]')];
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let inView = false;
+
+    function syncVideos() {
+      const screen = device!.dataset.screen;
+      for (const video of videos) {
+        const scr = video.closest<HTMLElement>('[data-scr]')?.dataset.scr;
+        const live = inView && !reduced && scr === screen;
+        if (live) {
+          if (!video.src) video.src = video.dataset.src!;
+          video.play().catch(() => {});
+        } else if (!video.paused) video.pause();
+      }
+    }
+
+    function activate(step: HTMLElement) {
+      steps.forEach((s) => (s === step ? s.setAttribute('aria-current', 'step') : s.removeAttribute('aria-current')));
+      device!.dataset.screen = step.dataset.step;
+      syncVideos();
+    }
+
+    // Desktop: the step crossing the middle of the viewport. Phones: the card snapped into the row.
+    const narrow = window.matchMedia('(max-width: 900px)');
+    let observer: IntersectionObserver | null = null;
+    function observe() {
+      observer?.disconnect();
+      observer = new IntersectionObserver(
+        (entries) => {
+          const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (hit) activate(hit.target as HTMLElement);
+        },
+        narrow.matches
+          ? { root: stepsList, threshold: [0.6, 0.9] }
+          : { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+      );
+      steps.forEach((s) => observer!.observe(s));
+    }
+    observe();
+    narrow.addEventListener('change', observe);
+
+    new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      syncVideos();
+    }).observe(device);
+
+    // The radius: the slider by the step drives the circle on the phone.
+    const input = tour.querySelector<HTMLInputElement>('[data-radius-input]');
+    const out = tour.querySelector<HTMLOutputElement>('[data-radius-out]');
+    const circle = device.querySelector<SVGCircleElement>('[data-radius-circle]');
+    const label = device.querySelector<HTMLElement>('[data-radius-label]');
+    const text = device.querySelector<HTMLElement>('[data-radius-text]');
+    const fill = device.querySelector<HTMLElement>('[data-radius-fill]');
+    // "24 km" as the page's language writes it, in Western digits like the rest of the site.
+    const distance = new Intl.NumberFormat(document.documentElement.lang || 'en', {
+      style: 'unit',
+      unit: 'kilometer',
+      unitDisplay: 'short',
+      numberingSystem: 'latn',
+    });
+    function setRadius(km: number) {
+      const value = distance.format(km);
+      if (out) out.value = value;
+      if (label) label.textContent = value;
+      if (text) text.textContent = value;
+      // Square root, so small radii stay visible on the little map.
+      circle?.setAttribute('r', String(8 + Math.sqrt(km / 100) * 70));
+      fill?.style.setProperty('--v', String(km / 100));
+    }
+    input?.addEventListener('input', () => {
+      setRadius(Number(input.value));
+      const pin = steps.find((s) => s.dataset.step === 'pin');
+      if (pin && device.dataset.screen !== 'pin') activate(pin);
+    });
+  }
+</script>

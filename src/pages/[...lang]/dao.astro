@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { localeParams, useLocale, type Locale } from '../../i18n';
+
+export const getStaticPaths = localeParams;
+
+const { locale } = Astro.props as { locale: Locale };
+const { t, path } = useLocale(locale);
+---
+
+<Base title={t.dao.title} description={t.dao.description}>
+  <section class="page container">
+    <p class="eyebrow">{t.dao.eyebrow}</p>
+    <h1 class="display">{t.dao.heading}</h1>
+    {t.dao.leads.map((lead) => <p class="lead">{lead}</p>)}
+    <div class="actions">
+      <a class="btn" href={path('/#onchain')}>{t.dao.onchain} <Icon name="arrow-right" /></a>
+      <a class="btn ghost" href={path('/#faq')}>{t.dao.faq}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+    min-height: 80svh;
+    align-content: center;
+    padding-top: calc(var(--header-h) + clamp(64px, 10vw, 140px));
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .page .display {
+    font-size: clamp(2.6rem, 6.4vw, 6.5rem);
+    max-width: 13ch;
+  }
+  .page .lead {
+    max-width: 52ch;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+  }
+</style>

@@ -1,0 +1,461 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { LOCALES, localizePath, unlocalizePath, useLocale } from '../i18n';
+
+const { locale, info, t, path } = useLocale(Astro.url);
+const page = unlocalizePath(Astro.url.pathname);
+// A missing page has no other languages: offer each language's home instead.
+const here = page.startsWith('/404') ? '/' : page;
+
+/** Section links resolve on every page: on the home page they scroll, elsewhere they go home first. */
+const nav = [
+  { label: t.nav.how, href: path('/#how') },
+  { label: t.nav.onchain, href: path('/#onchain') },
+  { label: t.nav.story, href: path('/#story') },
+  { label: t.nav.journal, href: path('/journal/'), journal: true },
+  { label: t.nav.faq, href: path('/#faq') },
+];
+---
+
+<header class="site-header" data-header>
+  <div class="bar container">
+    <a href={path('/')} class="home" aria-label={t.meta.home}>
+      <Logo size={30} />
+    </a>
+
+    <nav class="nav" aria-label={t.nav.main}>
+      <ul role="list">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={item.journal && page.startsWith('/journal') ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="end">
+      <div class="lang" data-lang>
+        <button class="lang-btn" type="button" aria-expanded="false" aria-controls="languages" data-lang-btn>
+          <Icon name="globe" size={18} />
+          <span class="mono" aria-hidden="true">{locale.toUpperCase()}</span>
+          <span class="sr-only">{t.nav.language}: {info.name}</span>
+        </button>
+        <div class="lang-panel" id="languages" data-lang-panel data-lenis-prevent hidden>
+          <p class="lang-title mono">{t.nav.language}</p>
+          <ul role="list">
+            {
+              LOCALES.map((l) => (
+                <li>
+                  <a
+                    href={localizePath(here, l.code)}
+                    hreflang={l.lang}
+                    lang={l.lang}
+                    aria-current={l.code === locale ? 'true' : undefined}
+                    data-lang-link={l.code}
+                  >
+                    <span>{l.name}</span>
+                    {l.code === locale && <Icon name="check" size={16} />}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+      <a class="btn cta" href={path('/#follow')}>
+        <span class="live-dot" aria-hidden="true"></span>
+        {t.nav.follow}
+      </a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" data-menu-btn>
+        <span class="sr-only">{t.nav.menu}</span>
+        <span class="burger" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="menu" id="menu" data-menu hidden>
+    <nav aria-label={t.nav.mobile}>
+      <ul role="list">
+        {
+          [{ label: t.nav.home, href: path('/') }, ...nav, { label: t.nav.follow, href: path('/#follow') }].map((item, i) => (
+            <li style={`--i:${i}`}>
+              <a href={item.href} data-menu-link>
+                <span class="mono">{String(i).padStart(2, '0')}</span>
+                {item.label}
+                <Icon name="arrow-up-right" size={22} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <p class="menu-foot mono">{t.nav.product}</p>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    height: var(--header-h);
+    transition:
+      transform 0.5s var(--ease-out),
+      background-color 0.4s,
+      box-shadow 0.4s;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(5 5 6 / 0.62);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 1px 0 var(--line);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .site-header[data-scrolled]::before {
+    opacity: 1;
+  }
+  .site-header[data-hidden]:not([data-open]) {
+    transform: translateY(-100%);
+  }
+  .bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    gap: 24px;
+  }
+  .home {
+    display: inline-flex;
+    padding: 8px 0;
+  }
+  .nav ul {
+    display: flex;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.035);
+    box-shadow: inset 0 0 0 1px var(--line);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .nav a {
+    display: block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    color: var(--text-2);
+    transition:
+      color 0.25s,
+      background-color 0.25s;
+  }
+  .nav a:hover,
+  .nav a[aria-current='page'] {
+    color: var(--text);
+    background: rgb(255 255 255 / 0.07);
+  }
+  .end {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lang {
+    position: relative;
+  }
+  .lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-size: 0.78rem;
+    color: var(--text-2);
+    transition:
+      color 0.25s,
+      background-color 0.25s;
+  }
+  .lang-btn:hover,
+  .lang-btn[aria-expanded='true'] {
+    color: var(--text);
+    background: rgb(255 255 255 / 0.08);
+  }
+  .lang-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    inset-inline-end: 0;
+    z-index: 2;
+    width: min(420px, calc(100vw - var(--gutter) * 2));
+    max-height: calc(100svh - var(--header-h) - 24px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 12px;
+    border-radius: var(--radius);
+    background: rgb(12 12 14 / 0.985);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow:
+      inset 0 0 0 1px var(--line-strong),
+      0 30px 80px -20px rgb(0 0 0 / 0.8);
+    animation: menu-in 0.4s var(--ease-out) both;
+  }
+  .lang-panel[hidden] {
+    display: none;
+  }
+  .lang-title {
+    padding: 6px 12px 10px;
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .lang-panel ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px;
+  }
+  .lang-panel a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 12px;
+    color: var(--text-2);
+    transition:
+      color 0.2s,
+      background-color 0.2s;
+  }
+  .lang-panel a:hover {
+    color: var(--text);
+    background: rgb(255 255 255 / 0.06);
+  }
+  .lang-panel a[aria-current] {
+    color: var(--neon);
+  }
+  .cta {
+    min-height: 44px;
+    padding: 0 18px;
+    font-size: 0.9rem;
+    --btn-bg: rgb(255 255 255 / 0.06);
+    --btn-fg: var(--text);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .cta:hover {
+    --btn-bg: var(--neon);
+    --btn-fg: #00180b;
+  }
+  .cta:hover .live-dot {
+    background: #00180b;
+  }
+  .cta:hover .live-dot::after {
+    border-color: #00180b;
+  }
+  .menu-btn {
+    display: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    background: rgb(255 255 255 / 0.04);
+  }
+  .burger {
+    position: relative;
+    display: block;
+    width: 18px;
+    height: 10px;
+    margin: auto;
+  }
+  .burger i {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform 0.45s var(--ease-out),
+      top 0.45s var(--ease-out);
+  }
+  .burger i:first-child {
+    top: 0;
+  }
+  .burger i:last-child {
+    top: 8.5px;
+  }
+  [data-open] .burger i:first-child {
+    top: 4.25px;
+    transform: rotate(45deg);
+  }
+  [data-open] .burger i:last-child {
+    top: 4.25px;
+    transform: rotate(-45deg);
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: calc(var(--header-h) + 24px) var(--gutter) 32px;
+    background: rgb(5 5 6 / 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu ul {
+    display: grid;
+  }
+  .menu li {
+    border-bottom: 1px solid var(--line);
+    animation: menu-in 0.6s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 45ms);
+  }
+  .menu a {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .menu a .mono {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--neon);
+    letter-spacing: 0;
+  }
+  .menu a :global(.icon) {
+    margin-inline-start: auto;
+    color: var(--text-3);
+  }
+  .menu-foot {
+    font-size: 0.75rem;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  @media (max-width: 1020px) {
+    .nav {
+      display: none;
+    }
+    .menu-btn {
+      display: grid;
+    }
+  }
+  @media (max-width: 720px) {
+    /* The list spans the bar, under the header, instead of hanging off the button. */
+    .lang {
+      position: static;
+    }
+    .lang-panel {
+      top: calc(100% - 4px);
+      inset-inline: var(--gutter);
+      width: auto;
+    }
+  }
+  @media (max-width: 520px) {
+    .cta {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const button = header.querySelector<HTMLButtonElement>('[data-menu-btn]')!;
+  const menu = header.querySelector<HTMLElement>('[data-menu]')!;
+  const langButton = header.querySelector<HTMLButtonElement>('[data-lang-btn]')!;
+  const langPanel = header.querySelector<HTMLElement>('[data-lang-panel]')!;
+
+  function setLang(open: boolean) {
+    langButton.setAttribute('aria-expanded', String(open));
+    langPanel.hidden = !open;
+    if (!open) return;
+    if (!menu.hidden) setOpen(false);
+    langPanel.querySelector<HTMLAnchorElement>('[aria-current]')?.focus();
+  }
+
+  langButton.addEventListener('click', () => setLang(langButton.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('click', (e) => {
+    if (!langPanel.hidden && !(e.target as Element | null)?.closest('[data-lang]')) setLang(false);
+  });
+  // A language picked here is a choice: the suggestion (LangSuggest.astro) stops offering another.
+  langPanel.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) =>
+    a.addEventListener('click', () => {
+      try {
+        localStorage.setItem('beenzer:lang', a.dataset.langLink!);
+      } catch {}
+    }),
+  );
+
+  function setOpen(open: boolean) {
+    if (open) setLang(false);
+    button.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+    header.toggleAttribute('data-open', open);
+    document.documentElement.classList.toggle('menu-open', open);
+    // Keep focus inside the menu while it covers the page.
+    document.querySelectorAll('#main, .site-footer, .skip-link').forEach((el) => el.toggleAttribute('inert', open));
+    if (open) menu.querySelector<HTMLAnchorElement>('[data-menu-link]')?.focus();
+    window.dispatchEvent(new CustomEvent(open ? 'scroll-lock' : 'scroll-unlock'));
+  }
+
+  button.addEventListener('click', () => setOpen(Boolean(menu.hidden)));
+  menu.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  window.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!langPanel.hidden) {
+      setLang(false);
+      langButton.focus();
+    } else if (!menu.hidden) {
+      setOpen(false);
+      button.focus();
+    }
+  });
+  window.matchMedia('(min-width: 1021px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  // Solid once the page moves; tucked away while reading down, back on the way up.
+  let last = window.scrollY;
+  function onScroll() {
+    const y = window.scrollY;
+    header.toggleAttribute('data-scrolled', y > 24);
+    if (Math.abs(y - last) > 6) {
+      const hide = y > last && y > 400;
+      header.toggleAttribute('data-hidden', hide);
+      if (hide && !langPanel.hidden) setLang(false);
+      last = y;
+    }
+  }
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>

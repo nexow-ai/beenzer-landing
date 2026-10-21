@@ -1,0 +1,39 @@
+---
+import Base from '../../../layouts/Base.astro';
+import JournalCards from '../../../components/JournalCards.astro';
+import { localeParams, useLocale, type Locale } from '../../../i18n';
+import { getPosts } from '../../../i18n/journal';
+
+export const getStaticPaths = localeParams;
+
+const { locale } = Astro.props as { locale: Locale };
+const { t } = useLocale(locale);
+const posts = await getPosts(locale);
+---
+
+<Base title={t.nav.journal} description={t.journal.description}>
+  <section class="page container">
+    <header class="head">
+      <p class="eyebrow">{t.journal.eyebrow}</p>
+      <h1 class="display" data-split>{t.journal.title}</h1>
+      <p class="lead">{t.journal.lead}</p>
+    </header>
+    <JournalCards posts={posts} level={2} />
+  </section>
+</Base>
+
+<style>
+  .page {
+    padding-top: calc(var(--header-h) + clamp(64px, 10vw, 140px));
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .head {
+    display: grid;
+    gap: 24px;
+    margin-bottom: clamp(48px, 7vw, 96px);
+  }
+  .head .display {
+    font-size: clamp(2.6rem, 6.4vw, 6.5rem);
+    max-width: 12ch;
+  }
+</style>

@@ -1,0 +1,424 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import selfie from '../assets/beenzer-18.jpg';
+import van from '../assets/posts/van.jpg';
+import friends from '../assets/posts/friends.jpg';
+import concert from '../assets/posts/concert.jpg';
+import selfie2 from '../assets/posts/selfie.jpg';
+import duo from '../assets/posts/duo.jpg';
+import crew from '../assets/posts/crew.jpg';
+import lights from '../assets/posts/lights.jpg';
+import glam from '../assets/posts/glam.jpg';
+import { FEATURED, formatLat, formatLon, shortKey } from '../data/site';
+import { fill, useLocale } from '../i18n';
+
+const { t, country } = useLocale(Astro.url);
+const labels = t.showcase.meta;
+
+// The values are the token's own (src/data/site.ts); only the country's name is translated.
+const meta = [
+  [labels.city, `${FEATURED.city}, ${country('CH')}`],
+  [labels.coordinates, `${formatLat(FEATURED.latitude, 2)}, ${formatLon(FEATURED.longitude, 2)}`],
+  [labels.date, FEATURED.date],
+  [labels.time, FEATURED.timeUtc],
+  [labels.visibility, FEATURED.visibility],
+  [labels.supply, String(FEATURED.supply)],
+  [labels.floor, FEATURED.floor],
+  [labels.creator, shortKey(FEATURED.creator)],
+];
+
+/** What the server writes into every Beenzer's metadata (server/src/services/nfts/mintNFT.ts). */
+const carries = t.showcase.carries;
+
+// An illustration of posts, not real ones: photos with a place under them.
+const moments = [
+  { img: van, place: t.places.tarifa, lat: 36.01, lon: -5.6 },
+  { img: friends, place: t.places.lisbon, lat: 38.72, lon: -9.14 },
+  { img: concert, place: t.places.berlin, lat: 52.52, lon: 13.4 },
+  { img: selfie2, place: t.places.barcelona, lat: 41.39, lon: 2.17 },
+  { img: duo, place: t.places.lagos, lat: 6.52, lon: 3.38 },
+  { img: crew, place: t.places.mexicoCity, lat: 19.43, lon: -99.13 },
+  { img: lights, place: t.places.lausanne, lat: 46.52, lon: 6.63 },
+  { img: glam, place: t.places.paris, lat: 48.86, lon: 2.35 },
+];
+---
+
+<section class="showcase section" id="proof" aria-labelledby="proof-title">
+  <div class="container grid">
+    <div class="card-stage" data-reveal>
+      <article class="nft" data-tilt aria-label={fill(t.showcase.card, { name: FEATURED.name })}>
+        <div class="nft-inner">
+          <div class="nft-photo">
+            <Image
+              src={selfie}
+              alt={t.showcase.alt}
+              widths={[360, 540, 720]}
+              sizes="(max-width: 900px) 80vw, 380px"
+              loading="lazy"
+            />
+            <div class="nft-top">
+              <span class="mono">{FEATURED.name}</span>
+              <span class="nft-desc" aria-label={t.showcase.description}>{FEATURED.description}</span>
+            </div>
+            <span class="nft-user mono">@{FEATURED.username}</span>
+          </div>
+          <dl class="nft-meta mono">
+            {
+              meta.map(([k, v]) => (
+                <div>
+                  <dt>{k}</dt>
+                  <dd><bdi>{v}</bdi></dd>
+                </div>
+              ))
+            }
+          </dl>
+          <div class="nft-foot">
+            <Logo size={18} />
+            <span class="mono">Solana · Metaplex</span>
+          </div>
+        </div>
+        <div class="holo" aria-hidden="true"></div>
+        <div class="glare" aria-hidden="true"></div>
+      </article>
+    </div>
+
+    <div class="copy">
+      <p class="eyebrow" data-reveal>{t.showcase.eyebrow}</p>
+      <h2 class="h2" id="proof-title" data-split>{t.showcase.title}</h2>
+      <p class="lead" data-reveal>{t.showcase.lead}</p>
+      <dl class="carries" data-reveal>
+        {
+          carries.map(([k, v]) => (
+            <div>
+              <dt class="mono">{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="links" data-reveal>
+        <a class="btn ghost" href={FEATURED.solscan} target="_blank" rel="noopener">
+          {t.showcase.solscan} <Icon name="arrow-up-right" />
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Left to right in every language: the strip runs one way. -->
+  <div class="moments" aria-hidden="true" dir="ltr" data-anim>
+    <div class="track">
+      {
+        [0, 1].map(() =>
+          moments.map((m, i) => (
+            <figure class="moment" style={`--r:${(i % 2 ? 1 : -1) * (1.5 + (i % 3))}deg`}>
+              <Image src={m.img} alt="" width={260} height={260} loading="lazy" />
+              <figcaption class="mono">
+                <b>{m.place}</b>
+                <span>
+                  {formatLat(m.lat, 2)} {formatLon(m.lon, 2)}
+                </span>
+              </figcaption>
+            </figure>
+          )),
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .showcase {
+    overflow: hidden;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(48px, 8vw, 120px);
+    align-items: center;
+  }
+  .card-stage {
+    display: grid;
+    place-items: center;
+    perspective: 1200px;
+  }
+  .nft {
+    --rx: 0deg;
+    --ry: 0deg;
+    --mx: 50%;
+    --my: 50%;
+    --on: 0;
+    position: relative;
+    width: min(380px, 80vw);
+    border-radius: 26px;
+    padding: 10px;
+    background: linear-gradient(150deg, #1f2a24, #0d0f0e 40%, #12201a);
+    box-shadow:
+      inset 0 0 0 1px rgb(22 253 130 / 0.25),
+      0 50px 120px -40px rgb(22 253 130 / 0.35),
+      0 30px 60px -30px rgb(0 0 0 / 0.9);
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    transform-style: preserve-3d;
+    transition: transform 0.6s var(--ease-out);
+    will-change: transform;
+  }
+  .nft[data-active] {
+    transition: transform 0.08s linear;
+  }
+  .nft-inner {
+    position: relative;
+    display: grid;
+    gap: 12px;
+    padding: 6px;
+  }
+  .nft-photo {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    aspect-ratio: 4 / 4.6;
+  }
+  .nft-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 40%;
+  }
+  .nft-top {
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: linear-gradient(180deg, rgb(0 0 0 / 0.6), transparent);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+  .nft-desc {
+    font-size: 1.4rem;
+  }
+  .nft-user {
+    position: absolute;
+    inset-inline-start: 14px;
+    bottom: 14px;
+    padding: 5px 10px;
+    border-radius: 99px;
+    background: rgb(0 0 0 / 0.55);
+    backdrop-filter: blur(8px);
+    font-size: 0.75rem;
+  }
+  .nft-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 14px;
+    padding: 4px 6px;
+    font-size: 0.68rem;
+  }
+  .nft-meta div {
+    display: grid;
+    gap: 2px;
+  }
+  .nft-meta dt {
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.6rem;
+  }
+  .nft-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 6px 2px;
+    border-top: 1px solid rgb(22 253 130 / 0.15);
+  }
+  .nft-foot .mono {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .holo,
+  .glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .holo {
+    opacity: calc(0.12 + var(--on) * 0.35);
+    background:
+      repeating-linear-gradient(
+        115deg,
+        rgb(19 152 185 / 0.0) 0%,
+        rgb(19 152 185 / 0.5) 6%,
+        rgb(22 253 130 / 0.5) 12%,
+        rgb(171 159 242 / 0.45) 18%,
+        rgb(19 152 185 / 0.0) 24%
+      )
+      calc(var(--mx) * 1.5) calc(var(--my) * 1.5) / 300% 300%;
+    mix-blend-mode: color-dodge;
+    transition: opacity 0.4s;
+  }
+  .glare {
+    opacity: var(--on);
+    background: radial-gradient(
+      circle at var(--mx) var(--my),
+      rgb(255 255 255 / 0.28),
+      rgb(255 255 255 / 0) 45%
+    );
+    mix-blend-mode: overlay;
+    transition: opacity 0.4s;
+  }
+
+  .copy {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+  }
+  .copy .h2 {
+    max-width: 12ch;
+  }
+  .copy .lead {
+    max-width: 44ch;
+  }
+  .carries {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    width: 100%;
+    max-width: 40rem;
+    border-top: 1px solid var(--line);
+  }
+  .carries div {
+    display: grid;
+    gap: 4px;
+    padding: 16px 16px 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .carries dt {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--neon);
+  }
+  .carries dd {
+    color: var(--text-2);
+    font-size: 0.98rem;
+  }
+
+  .moments {
+    margin-top: clamp(80px, 10vw, 140px);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .track {
+    display: flex;
+    gap: 28px;
+    width: max-content;
+    padding-block: 24px;
+    animation: marquee 60s linear infinite;
+  }
+  .moments:hover .track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(calc(-50% - 14px));
+    }
+  }
+  .moment {
+    flex: none;
+    width: 220px;
+    padding: 10px 10px 14px;
+    border-radius: 18px;
+    background: #f4f4f5;
+    color: #18181b;
+    rotate: var(--r);
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.9);
+    transition:
+      rotate 0.5s var(--ease-out),
+      translate 0.5s var(--ease-out);
+  }
+  .moment:hover {
+    rotate: 0deg;
+    translate: 0 -8px;
+  }
+  .moment :global(img) {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .moment figcaption {
+    display: grid;
+    gap: 2px;
+    margin-top: 10px;
+    font-size: 0.68rem;
+  }
+  .moment b {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    letter-spacing: -0.02em;
+  }
+  .moment span {
+    color: #52525b;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .copy {
+      order: -1;
+    }
+  }
+  @media (max-width: 520px) {
+    .carries {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .moment {
+      width: 170px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .moments {
+      overflow-x: auto;
+    }
+    .track {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const cards = document.querySelectorAll<HTMLElement>('[data-tilt]');
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (fine && !reduced) {
+    cards.forEach((card) => {
+      let frame = 0;
+      card.addEventListener('pointermove', (e) => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width;
+          const y = (e.clientY - r.top) / r.height;
+          card.toggleAttribute('data-active', true);
+          card.style.setProperty('--ry', `${(x - 0.5) * 22}deg`);
+          card.style.setProperty('--rx', `${(0.5 - y) * 18}deg`);
+          card.style.setProperty('--mx', `${x * 100}%`);
+          card.style.setProperty('--my', `${y * 100}%`);
+          card.style.setProperty('--on', '1');
+        });
+      });
+      card.addEventListener('pointerleave', () => {
+        cancelAnimationFrame(frame);
+        card.removeAttribute('data-active');
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--on', '0');
+      });
+    });
+  }
+</script>

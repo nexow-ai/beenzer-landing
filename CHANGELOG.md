@@ -1,9 +1,53 @@
 # Changelog
 
-All notable changes to the Beenzer Landing Page project will be documented in this file.
+All notable changes to the Beenzer website will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- The site in 20 languages: English, Spanish, French, German, Italian, Brazilian Portuguese, Dutch, Turkish, Russian, Ukrainian, Arabic, Hebrew, Hindi, Thai, Vietnamese, Indonesian, Simplified and Traditional Chinese, Japanese and Korean, journal included. English stays at the root; the others live under their code (`/fr/`, `/zh-cn/`)
+- Right-to-left layout for Arabic and Hebrew, down to the globe, which lands on the other side of the copy
+- A language menu in the header, every language in the footer, and a one-time offer of the visitor's own language (no redirects)
+- `hreflang` alternates in every page and in the sitemap, per-language Open Graph locale and JSON-LD, and a 404 page per language
+- System fonts for Arabic, Hebrew, Devanagari, Thai and CJK scripts, with spacing and line heights set for them
+- The site notice says what the language choice keeps in the browser, and that the English version applies if a translation differs
+- The home page ends in a night city in Beenzer's neon: Solana addresses raining down, the wordmark behind the skyline, posts pinned over the rooftops, and a grid floor running towards the viewer, with two layers of buildings that drift with the mouse
+
+### Fixed
+
+- `npm run check` no longer fails on Lenis's private `updateClassName`
+
+## [2.0.0] - 2026-10-20
+
+A rebuild from scratch, for Beenzer as a product of Nexow, Inc. (nexow.studio).
+
+### Added
+
+- Astro 7 static site with self-hosted fonts and no cookies, analytics or trackers
+- Scroll-driven WebGL hero: a dot-matrix globe the camera falls onto, in five levels of detail, landing on the shore of Lake Geneva where BEENZER #18 was minted, with the logo's pin in 3D
+- "How it works" tour: a phone built in HTML that runs the Flutter rebuild's screens (map, camera, pin with a live visibility slider, feed, mint)
+- BEENZER #18 as a holographic card, with its real on-chain data
+- On-chain section, read from the minting server: Phantom sign-in, Arweave, Metaplex editions, royalties, and the mint pipeline
+- Story timeline and the original app's walkthrough, cropped to its screen
+- Journal with three articles, a site notice, a DAO page, and a 404
+- SEO: canonical URLs, Open Graph image rendered from the hero, JSON-LD (organization, app, FAQ, articles), sitemap, robots, web manifest and icons
+- Served at beenzer.xyz from a Cloudflare Worker, with caching and security headers and redirects from the original site's addresses
+
+### Changed
+
+- Ownership: Nexow, Inc. in the footer, the license and the metadata
+- Copy now follows the facts: the app is being rebuilt in Flutter for iOS and Android, and any post can become a Solana NFT
+- The featured NFT is BEENZER #18 in Savigny, as on-chain, instead of "#33" in Barcelona
+
+### Removed
+
+- The jQuery and Bootstrap template, its demo pages in `html/`, and about 670 MB of unused stock video
+- Unverified numbers, placeholder sellers and auctions, the defunct Google Play link and the expired Discord and Telegram invites
+- The $BEEN and $BEENZ "invest and earn dividends" copy
 
 ## [1.0.6] - 2025-11-05
 

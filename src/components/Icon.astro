@@ -1,0 +1,32 @@
+---
+import { ICONS, type IconName } from '../lib/icons';
+
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+  /** Read out by screen readers. Without it the icon is decorative. */
+  label?: string;
+}
+
+const { name, size = 20, class: className, label } = Astro.props;
+const icon = ICONS[name];
+// Arrows that point along the line of reading turn around in right-to-left pages (global.css).
+const directional = name === 'arrow-right' || name === 'arrow-up-right';
+---
+
+<svg
+  class:list={['icon', { 'icon-dir': directional }, className]}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill={icon.fill ? 'currentColor' : 'none'}
+  stroke={icon.fill ? undefined : 'currentColor'}
+  stroke-width={icon.fill ? undefined : 2}
+  stroke-linecap={icon.fill ? undefined : 'round'}
+  stroke-linejoin={icon.fill ? undefined : 'round'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  set:html={icon.body}
+/>

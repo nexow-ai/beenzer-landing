@@ -1,0 +1,235 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Icon from '../../../components/Icon.astro';
+import JournalCards from '../../../components/JournalCards.astro';
+import { SITE } from '../../../data/site';
+import { LOCALES, fill, localeParams, useLocale, type Locale } from '../../../i18n';
+import { getPosts, type Post } from '../../../i18n/journal';
+
+/** Every post in every language; one without a translation yet is shown in English. */
+export async function getStaticPaths() {
+  const pages = await Promise.all(
+    localeParams().map(async ({ params, props }) =>
+      (await getPosts(props.locale)).map((post) => ({
+        params: { ...params, slug: post.slug },
+        props: { locale: props.locale, post },
+      })),
+    ),
+  );
+  return pages.flat();
+}
+
+const { locale, post } = Astro.props as { locale: Locale; post: Post };
+const { t, lang, path, date } = useLocale(locale);
+const { entry, slug, fallback } = post;
+const { Content } = await render(entry);
+const others = (await getPosts(locale)).filter((p) => p.slug !== slug);
+// The languages this post is written in, for hreflang.
+const all = await getCollection('journal');
+const languages = LOCALES.map((l) => l.code).filter((code) => all.some((p) => p.id === `${code}/${slug}`));
+const published = date(entry.data.date, { day: 'numeric', month: 'long', year: 'numeric' });
+const iso = entry.data.date.toISOString();
+// Shown in English for want of a translation: the page says so, and marks the text as English.
+const english = fallback ? { lang: 'en', dir: 'ltr' } : {};
+
+const article = {
+  '@type': 'Article',
+  headline: entry.data.title,
+  description: entry.data.description,
+  inLanguage: fallback ? 'en' : lang,
+  datePublished: iso,
+  author: { '@type': 'Organization', name: SITE.owner.name, url: SITE.owner.url },
+  publisher: { '@id': `${SITE.owner.url}/#org` },
+  mainEntityOfPage: new URL(fallback ? `/journal/${slug}/` : path(`/journal/${slug}/`), Astro.site).href,
+};
+---
+
+<Base
+  title={entry.data.title}
+  description={entry.data.description}
+  type="article"
+  published={iso}
+  schema={[article]}
+  languages={languages}
+>
+  <article class="article">
+    <header class="container head">
+      <a class="back mono" href={path('/journal/')}><Icon name="arrow-right" size={14} class="flip" /> {t.nav.journal}</a>
+      <p class="meta mono">
+        <span class="kind">{t.journal.kinds[entry.data.kind]}</span>
+        <time datetime={iso}>{published}</time>
+        <span>{fill(t.journal.minRead, { n: entry.data.read })}</span>
+      </p>
+      {fallback && <p class="untranslated">{t.journal.untranslated}</p>}
+      <h1 class="title" data-split {...english}>{entry.data.title}</h1>
+      <p class="lead" {...english}>{entry.data.description}</p>
+    </header>
+    <div class="container">
+      <div class="prose" {...english}>
+        <Content />
+      </div>
+    </div>
+  </article>
+
+  <section class="more container" aria-labelledby="more-title">
+    <h2 class="h3" id="more-title">{t.journal.more}</h2>
+    <JournalCards posts={others} />
+  </section>
+</Base>
+
+<style>
+  .article {
+    padding-top: calc(var(--header-h) + clamp(48px, 8vw, 110px));
+  }
+  /* Header and body share one column, so their left edges line up. */
+  .head {
+    display: grid;
+    gap: 22px;
+    max-width: calc(46rem + var(--gutter) * 2);
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-self: start;
+    min-height: 36px;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    transition: color 0.2s;
+  }
+  .back:hover {
+    color: var(--neon);
+  }
+  .back :global(.flip) {
+    rotate: 180deg;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .kind {
+    color: var(--neon);
+  }
+  .title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    font-size: clamp(2.3rem, 5.4vw, 4.6rem);
+    text-wrap: balance;
+  }
+  .head .lead {
+    max-width: 46ch;
+  }
+  .prose {
+    max-width: 46rem;
+    margin: clamp(48px, 7vw, 88px) auto 0;
+    padding-bottom: clamp(72px, 10vw, 120px);
+    color: var(--text-2);
+    font-size: 1.125rem;
+    line-height: 1.75;
+  }
+  .prose :global(> * + *) {
+    margin-top: 1.2em;
+  }
+  .prose :global(h2) {
+    margin-top: 2.2em;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: var(--text);
+  }
+  .prose :global(strong) {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .prose :global(a) {
+    color: var(--neon);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .prose :global(ul) {
+    padding-inline-start: 1.2em;
+  }
+  .prose :global(li + li) {
+    margin-top: 0.6em;
+  }
+  .prose :global(li::marker) {
+    color: var(--neon);
+  }
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--text);
+    /* Attribute names and JSON read left to right in every language. */
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+  .prose :global(:not(pre) > code) {
+    white-space: nowrap;
+    padding: 0.1em 0.4em;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.06);
+  }
+  .prose :global(pre) {
+    direction: ltr;
+    text-align: left;
+    overflow-x: auto;
+    padding: 20px 22px;
+    border-radius: 16px;
+    background: #0b0b0d !important;
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .prose :global(table) {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  .prose :global(th),
+  .prose :global(td) {
+    padding-block: 10px;
+    padding-inline: 0 14px;
+    border-bottom: 1px solid var(--line);
+    text-align: start;
+    vertical-align: top;
+  }
+  .prose :global(th) {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .untranslated {
+    max-width: 46ch;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-size: 0.95rem;
+    color: var(--text-2);
+  }
+  .more {
+    display: grid;
+    gap: 32px;
+    padding-top: clamp(64px, 8vw, 96px);
+    padding-bottom: clamp(96px, 12vw, 160px);
+    border-top: 1px solid var(--line);
+  }
+</style>

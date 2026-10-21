@@ -1,0 +1,9 @@
+---
+/** The 404 page in every language but English, moved to /<lang>/404.html at build (astro.config.mjs). */
+import NotFound from '../../components/NotFound.astro';
+import { localeParams } from '../../i18n';
+
+export const getStaticPaths = () => localeParams().filter((p) => p.params.lang !== undefined);
+---
+
+<NotFound />

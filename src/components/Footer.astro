@@ -1,0 +1,265 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import CryptoCity from './CryptoCity.astro';
+import { FEATURED, SITE, SOCIAL, formatLat, formatLon } from '../data/site';
+import { LOCALES, localizePath, unlocalizePath, useLocale } from '../i18n';
+
+const { locale, t, fill, path } = useLocale(Astro.url);
+const page = unlocalizePath(Astro.url.pathname);
+const here = page.startsWith('/404') ? '/' : page;
+// The home page ends in the night city; every other page in the wordmark alone.
+const home = page === '/';
+
+const year = new Date().getFullYear();
+const columns = [
+  {
+    title: 'Beenzer',
+    links: [
+      { label: t.nav.how, href: path('/#how') },
+      { label: t.nav.onchain, href: path('/#onchain') },
+      { label: t.nav.story, href: path('/#story') },
+      { label: t.nav.journal, href: path('/journal/') },
+      { label: t.nav.faq, href: path('/#faq') },
+    ],
+  },
+  {
+    title: t.footer.community,
+    links: SOCIAL.map((s) => ({ label: s.label, href: s.href, external: true })),
+  },
+  {
+    title: t.footer.company,
+    links: [
+      { label: t.footer.studio, href: SITE.owner.url, external: true },
+      { label: t.footer.atNexow, href: SITE.owner.product, external: true },
+      { label: t.footer.contact, href: SITE.owner.contact, external: true },
+      { label: t.footer.notice, href: path('/legal/') },
+    ],
+  },
+];
+---
+
+<footer class="site-footer">
+  <div class="container top">
+    <div class="intro">
+      <a href={path('/')} aria-label={t.meta.home}><Logo size={34} /></a>
+      <p class="tag" lang="en" translate="no"><bdi>{SITE.tagline}</bdi></p>
+      <p class="body">{t.footer.body}</p>
+    </div>
+    {
+      columns.map((col) => (
+        <nav class="col" aria-label={col.title}>
+          <p class="col-title mono">{col.title}</p>
+          <ul role="list">
+            {col.links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  {...('external' in link && link.external ? { target: '_blank', rel: 'noopener' } : {})}
+                >
+                  {link.label}
+                  {'external' in link && link.external && <Icon name="arrow-up-right" size={14} />}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+
+  <nav class="container languages" aria-label={t.footer.languages}>
+    <p class="col-title mono">{t.footer.languages}</p>
+    <ul role="list">
+      {
+        LOCALES.map((l) => (
+          <li>
+            <a
+              href={localizePath(here, l.code)}
+              hreflang={l.lang}
+              lang={l.lang}
+              aria-current={l.code === locale ? 'true' : undefined}
+            >
+              {l.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <div class="container owner">
+    <a class="nexow" href={SITE.owner.url} target="_blank" rel="noopener">
+      <span class="mono">{t.footer.productOf}</span>
+      <img src="/nexow-white.png" alt="Nexow" width="104" height="64" loading="lazy" decoding="async" />
+    </a>
+    <p class="legal">{fill(t.footer.legal, { year, company: SITE.owner.name })}</p>
+    <p class="mono sign" dir="ltr">
+      <span>{formatLat(FEATURED.latitude, 2)}</span>
+      <span>{formatLon(FEATURED.longitude, 2)}</span>
+      <span>v{SITE.version}</span>
+    </p>
+  </div>
+
+  {
+    home ? (
+      <CryptoCity />
+    ) : (
+      <div class="giant" aria-hidden="true" lang="en">
+        <span>BEENZER</span>
+      </div>
+    )
+  }
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    overflow: hidden;
+    padding-top: clamp(72px, 10vw, 120px);
+    border-top: 1px solid var(--line);
+    background:
+      radial-gradient(80% 60% at 50% 120%, rgb(22 253 130 / 0.12), transparent 70%),
+      var(--bg);
+  }
+  .top {
+    display: grid;
+    grid-template-columns: 1.6fr repeat(3, 1fr);
+    gap: 48px 32px;
+  }
+  .intro {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+    max-width: 36ch;
+  }
+  .tag {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: -0.03em;
+  }
+  .intro .body {
+    font-size: 0.95rem;
+  }
+  .col-title {
+    margin-bottom: 18px;
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .col ul {
+    display: grid;
+    gap: 4px;
+  }
+  .col a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    color: var(--text-2);
+    transition: color 0.2s;
+  }
+  .col a:hover {
+    color: var(--neon);
+  }
+  .languages {
+    margin-top: clamp(48px, 7vw, 80px);
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .languages ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 22px;
+  }
+  .languages a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    font-size: 0.92rem;
+    color: var(--text-2);
+    transition: color 0.2s;
+  }
+  .languages a:hover,
+  .languages a[aria-current] {
+    color: var(--neon);
+  }
+  .owner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 32px;
+    margin-top: 28px;
+    padding-block: 28px;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+    color: var(--text-3);
+  }
+  .nexow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+  }
+  .nexow:hover {
+    opacity: 1;
+  }
+  .nexow .mono {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .nexow img {
+    height: 30px;
+    width: auto;
+  }
+  .legal {
+    flex: 1 1 320px;
+  }
+  .sign {
+    display: flex;
+    gap: 16px;
+    font-size: 0.75rem;
+  }
+  .giant {
+    pointer-events: none;
+    user-select: none;
+    margin-top: 8px;
+    line-height: 0.74;
+    text-align: center;
+    overflow: hidden;
+  }
+  .giant span {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 23.5vw;
+    letter-spacing: -0.06em;
+    background: linear-gradient(180deg, rgb(22 253 130 / 0.22), rgb(22 253 130 / 0) 78%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transform: translateY(14%);
+  }
+
+  @media (max-width: 900px) {
+    .top {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .intro {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 560px) {
+    .top {
+      grid-template-columns: 1fr 1fr;
+    }
+    .sign {
+      flex-wrap: wrap;
+    }
+  }
+</style>

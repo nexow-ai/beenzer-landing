@@ -1,0 +1,9 @@
+# Addresses of the original site (2022–2025), sent to where their content lives now.
+/index.html / 301
+/dao.html /dao/ 301
+/doc.html /journal/ 301
+/news-single.html /journal/ 301
+/html/* / 301
+# English lives at the root; /en/ is not a path of its own.
+/en / 301
+/en/* /:splat 301

@@ -1,0 +1,139 @@
+---
+import { SITE } from '../data/site';
+import { faq } from '../data/faq';
+import { rich, useLocale } from '../i18n';
+
+const { locale, t } = useLocale(Astro.url);
+---
+
+<section class="faq section" id="faq" aria-labelledby="faq-title">
+  <div class="container grid">
+    <div class="head">
+      <p class="eyebrow" data-reveal>{t.faq.eyebrow}</p>
+      <h2 class="h2" id="faq-title" data-split>{t.faq.title}</h2>
+      <p class="body" data-reveal set:html={rich(t.faq.more, { contact: SITE.owner.contact })} />
+    </div>
+    <div class="list">
+      {
+        faq(locale).map((f, i) => (
+          <details class="item" name="faq" data-reveal open={i === 0}>
+            <summary>
+              <span>{f.q}</span>
+              <span class="plus" aria-hidden="true" />
+            </summary>
+            <div class="answer">
+              <p>{f.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq {
+    border-top: 1px solid var(--line);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(40px, 7vw, 100px);
+    align-items: start;
+  }
+  .head {
+    position: sticky;
+    top: calc(var(--header-h) + 40px);
+    display: grid;
+    gap: 20px;
+  }
+  .list {
+    border-top: 1px solid var(--line);
+  }
+  .item {
+    border-bottom: 1px solid var(--line);
+  }
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    min-height: 72px;
+    padding: 20px 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    transition: color 0.2s;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary:hover {
+    color: var(--neon);
+  }
+  .plus {
+    position: relative;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition:
+      transform 0.5s var(--ease-out),
+      background-color 0.3s;
+  }
+  .plus::before,
+  .plus::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 1.5px;
+    translate: -50% -50%;
+    background: currentColor;
+    border-radius: 2px;
+  }
+  .plus::after {
+    rotate: 90deg;
+    transition: rotate 0.5s var(--ease-out);
+  }
+  [open] .plus {
+    background: var(--neon);
+    color: #00180b;
+    transform: rotate(180deg);
+  }
+  [open] .plus::after {
+    rotate: 0deg;
+  }
+  .answer {
+    padding: 0 0 28px;
+    padding-inline-end: 64px;
+    color: var(--text-2);
+    max-width: 62ch;
+  }
+  .item[open] .answer {
+    animation: open 0.6s var(--ease-out);
+  }
+  @keyframes open {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .head {
+      position: relative;
+      top: 0;
+    }
+    .answer {
+      padding-inline-end: 0;
+    }
+  }
+</style>
